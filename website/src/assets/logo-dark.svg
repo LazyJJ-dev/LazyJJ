@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Simple bird silhouette representing JJ's mascot -->
+  <circle cx="100" cy="100" r="80" fill="#93c5fd" opacity="0.1"/>
+  <text x="100" y="120" font-family="system-ui, sans-serif" font-size="72" font-weight="bold" fill="#93c5fd" text-anchor="middle">JJ</text>
+</svg>

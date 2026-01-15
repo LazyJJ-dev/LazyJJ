@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build test container
+        run: docker build -t lazyjj-tests -f tests/Dockerfile .
+
+      - name: Run tests
+        run: docker run --rm lazyjj-tests
+
+  build-website:
+    name: Build Website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        working-directory: website
+        run: npm ci
+
+      - name: Build website
+        working-directory: website
+        run: npm run build
+
+  test-install:
+    name: Test Install Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install cargo-binstall
+        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+
+      - name: Install JJ
+        run: ~/.cargo/bin/cargo-binstall --no-confirm --strategies crate-meta-data jj-cli
+
+      - name: Configure git
+        run: |
+          git config --global user.email "test@lazyjj.dev"
+          git config --global user.name "LazyJJ Test"
+
+      - name: Run install script
+        run: ./install.sh
+
+      - name: Verify installation
+        run: |
+          # Check symlinks were created
+          ls -la ~/.config/jj/conf.d/
+          test -L ~/.config/jj/conf.d/lazyjj-aliases.toml
+          test -L ~/.config/jj/conf.d/lazyjj-revsets.toml
+          test -L ~/.config/jj/conf.d/lazyjj-stack.toml
+
+          # Verify JJ can load the config
+          ~/.cargo/bin/jj config list | grep -q "aliases"
+
+      - name: Run uninstall script
+        run: ./install.sh --uninstall
+
+      - name: Verify uninstall
+        run: |
+          # Symlinks should be removed
+          test ! -L ~/.config/jj/conf.d/lazyjj-aliases.toml
+          # LazyJJ directory should be removed
+          test ! -d ~/.config/jj/lazyjj

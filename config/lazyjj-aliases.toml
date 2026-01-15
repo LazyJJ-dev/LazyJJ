@@ -1,0 +1,71 @@
+# LazyJJ Core Aliases
+# https://lazyjj.dev
+#
+# Essential command shortcuts for everyday JJ usage.
+# These aliases reduce typing for the most common JJ operations.
+
+[aliases]
+
+# st - Show working copy status
+# What: Shows which files are modified, added, or deleted in your working copy.
+# When: Use frequently to see what's changed before committing.
+# Usage: jj st
+st = ["status"]
+
+# d - Show diff of working copy changes
+# What: Displays the actual line-by-line changes in your working copy.
+# When: Use to review changes before describing/committing.
+# Usage: jj d
+#        jj d <file>     # Diff specific file
+d = ["diff"]
+
+# diffs - Compact diff summary without pager
+# What: Shows a one-line-per-file summary of changes (Added/Modified/Deleted).
+# When: Use for a quick overview of which files changed, without line details.
+# Usage: jj diffs
+diffs = ["diff", "--summary", "--no-pager"]
+
+# diffls - List changed filenames only
+# What: Outputs just the names of changed files, one per line.
+# When: Useful for scripting or piping to other commands.
+# Usage: jj diffls
+#        jj diffls | xargs ...
+diffls = ["diff", "--name-only", "--no-pager"]
+
+# l - Quick log (last 10 commits)
+# What: Shows the 10 most recent commits in the log.
+# When: Use for a quick glance at recent history without scrolling.
+# Usage: jj l
+l = ["log", "--limit", "10"]
+
+# ll - Full log
+# What: Shows the complete commit log with default pager.
+# When: Use when you need to see the full history.
+# Usage: jj ll
+ll = ["log"]
+
+# hist - Log without pager
+# What: Shows the commit log without invoking a pager.
+# When: Useful for piping output or quick terminal viewing.
+# Usage: jj hist
+#        jj hist | grep "pattern"
+hist = ["log", "--no-pager"]
+
+# n - Create a new commit
+# What: Creates a new empty commit on top of the current one.
+# When: Use when you've finished changes and want to start fresh work.
+# Usage: jj n                    # New commit on current
+#        jj n <revision>         # New commit on specific revision
+n = ["new"]
+
+# e - Edit a commit
+# What: Moves the working copy to edit an existing commit.
+# When: Use to amend or fix a previous commit in your stack.
+# Usage: jj e <revision>         # Edit a specific commit
+e = ["edit"]
+
+# gf - Git fetch
+# What: Fetches changes from all Git remotes.
+# When: Use to sync with remote repositories before rebasing.
+# Usage: jj gf
+gf = ["git", "fetch"]

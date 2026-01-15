@@ -1,0 +1,150 @@
+# LazyJJ Claude Integration
+# https://lazyjj.dev
+#
+# Commands for AI-assisted development with Claude CLI.
+# Requires: claude CLI (https://claude.ai/code)
+#
+# These commands help integrate Claude (AI assistant) into your JJ workflow,
+# using JJ workspaces for isolation and tmux for session management.
+#
+# Workspace Model:
+#   - Main repo: ~/project
+#   - Claude workspaces: ~/project/.jj-workspaces/<name>
+#   - Each workspace is a JJ workspace with its own tmux session
+
+[aliases]
+
+# =============================================================================
+# WORKSPACE MANAGEMENT
+# =============================================================================
+
+# clstart - Start a Claude workspace with tmux session
+# What: Creates a JJ workspace for isolated AI-assisted work in a tmux session.
+#       Workspaces are created in .jj-workspaces/<name> directory.
+# When: Use to start a new task with Claude without affecting your main workspace.
+# Usage: jj clstart feature-x
+#        jj clstart bug-fix-123
+#
+# How it works:
+#   1. Creates workspace directory at .jj-workspaces/<name>
+#   2. Runs `jj workspace add` to create a JJ workspace
+#   3. Creates a tmux session and starts Claude in it
+#   4. Provides attach instructions
+clstart = ["util", "exec", "--", "sh", "-c", """
+WORKSPACE_NAME="${1:-claude-$(date +%s)}"
+WORKSPACE_DIR=".jj-workspaces/$WORKSPACE_NAME"
+
+# Create JJ workspace
+jj workspace add "$WORKSPACE_DIR" 2>/dev/null || { echo "Failed to create workspace"; exit 1; }
+
+# Start tmux session with Claude
+if command -v tmux >/dev/null 2>&1; then
+  tmux new-session -d -s "$WORKSPACE_NAME" -c "$WORKSPACE_DIR"
+  tmux send-keys -t "$WORKSPACE_NAME" "claude" Enter
+  echo "Started tmux session: $WORKSPACE_NAME"
+  echo "Attach with: tmux attach -t $WORKSPACE_NAME"
+else
+  echo "Workspace created at: $WORKSPACE_DIR"
+  echo "tmux not available - start Claude manually in that directory"
+fi
+"""]
+
+# clstop - Stop and clean up a Claude workspace
+# What: Removes a JJ workspace, deletes its directory, and kills the tmux session.
+# When: Use when you're done with a task and want to clean up.
+# Usage: jj clstop feature-x
+#
+# How it works:
+#   1. Kills the tmux session
+#   2. Runs `jj workspace forget` to remove from JJ
+#   3. Deletes the workspace directory
+clstop = ["util", "exec", "--", "sh", "-c", """
+WORKSPACE_NAME="${1:-$(tmux display-message -p '#S' 2>/dev/null)}"
+if [ -z "$WORKSPACE_NAME" ]; then
+  echo "Usage: jj clstop <workspace-name>"
+  exit 1
+fi
+
+WORKSPACE_DIR=".jj-workspaces/$WORKSPACE_NAME"
+
+# Kill tmux session if it exists
+tmux kill-session -t "$WORKSPACE_NAME" 2>/dev/null
+
+# Forget the JJ workspace
+jj workspace forget "$WORKSPACE_NAME" 2>/dev/null
+
+# Clean up directory
+rm -rf "$WORKSPACE_DIR" 2>/dev/null
+
+echo "Stopped and cleaned up workspace: $WORKSPACE_NAME"
+"""]
+
+# =============================================================================
+# AI-ASSISTED OPERATIONS
+# =============================================================================
+
+# clresolve - Resolve conflicts using Claude
+# What: Lists conflicted files and launches Claude to help resolve them.
+# When: Use after a rebase or merge that resulted in conflicts.
+# Usage: jj clresolve
+#
+# How it works:
+#   1. Lists conflicted files using `jj resolve --list`
+#   2. For each file, launches Claude with conflict resolution prompt
+clresolve = ["util", "exec", "--", "sh", "-c", """
+CONFLICTS=$(jj resolve --list 2>/dev/null | awk '{print $1}')
+if [ -z "$CONFLICTS" ]; then
+  echo "No conflicts to resolve"
+  exit 0
+fi
+
+echo "Conflicts found:"
+echo "$CONFLICTS"
+echo ""
+echo "Starting Claude to help resolve..."
+
+for file in $CONFLICTS; do
+  echo "Resolving: $file"
+  claude --prompt "Help me resolve the merge conflict in this file. Show me the resolved version." "$file"
+done
+"""]
+
+# clreview - Review a PR using Claude
+# What: Fetches a PR diff and asks Claude to review it.
+# When: Use to get AI-assisted code review of a pull request.
+# Usage: jj clreview 123
+#        jj clreview feature-branch
+#
+# How it works:
+#   1. Uses gh CLI to fetch the PR diff
+#   2. Pipes diff to Claude with review prompt
+clreview = ["util", "exec", "--", "sh", "-c", """
+PR="${1:-$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1)}"
+if [ -z "$PR" ]; then
+  echo "Usage: jj clreview <pr-number-or-branch>"
+  exit 1
+fi
+
+echo "Fetching PR diff..."
+DIFF=$(gh pr diff "$PR" 2>/dev/null)
+if [ -z "$DIFF" ]; then
+  echo "Could not fetch PR diff"
+  exit 1
+fi
+
+echo "Starting Claude review..."
+echo "$DIFF" | claude --prompt "Review this pull request diff. Look for bugs, security issues, and suggest improvements."
+"""]
+
+# claude-checkpoint - Create a checkpoint commit for Claude's work
+# What: Describes current commit and creates a new one.
+#       Used to save Claude's progress at logical stopping points.
+# When: Use during Claude sessions to checkpoint progress.
+# Usage: jj claude-checkpoint
+#        jj claude-checkpoint "implemented feature X"
+claude-checkpoint = ["util", "exec", "--", "sh", "-c", """
+MSG="${1:-checkpoint}"
+jj describe -m "checkpoint: $MSG"
+jj new
+echo "Checkpointed: $MSG"
+"""]

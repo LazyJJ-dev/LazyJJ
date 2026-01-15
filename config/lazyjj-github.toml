@@ -1,0 +1,142 @@
+# LazyJJ GitHub Integration
+# https://lazyjj.dev
+#
+# Commands for working with GitHub PRs, including stacked PRs workflow.
+# Requires: gh CLI (https://cli.github.com)
+#
+# Stacked PRs Workflow:
+#   1. Create multiple commits in your stack, each with a bookmark
+#   2. jj sprs    - Create/update PRs for each bookmark
+#   3. jj prs     - Generate a summary of the stack
+#   4. jj uprs    - Update PR comments with the stack summary
+
+[aliases]
+
+# =============================================================================
+# REPOSITORY HELPERS
+# =============================================================================
+
+# repo - Get the GitHub repo name from origin remote
+# What: Extracts owner/repo from the origin remote URL (e.g., "owner/repo").
+# When: Used internally by other GitHub commands to target the right repo.
+# Usage: jj repo
+#        # Output: "lazyjj-dev/lazyjj"
+repo = ["util", "exec", "--", "sh", "-c", "jj git remote list | grep origin | awk '{print $2}' | sed 's/.*github.com[:\\/]//' | sed 's/.git$//'"]
+
+# gh - Run GitHub CLI command
+# What: Wrapper for `gh` CLI.
+# When: Use to run any gh command.
+# Usage: jj gh pr list
+#        jj gh issue view 123
+gh = ["util", "exec", "--", "gh"]
+
+# =============================================================================
+# PULL REQUEST VIEWING
+# =============================================================================
+
+# prv - View current PR details
+# What: Shows details of the PR for the current bookmark.
+# When: Use to check PR status, reviews, and checks.
+# Usage: jj prv
+prv = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\""]
+
+# pro - Open current PR in browser
+# What: Opens the PR for current bookmark in your default browser.
+# When: Use to quickly jump to the PR on GitHub.
+# Usage: jj pro
+pro = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\" --web"]
+
+# =============================================================================
+# STACKED PRS
+# =============================================================================
+
+# prstack - List all bookmarks in the current stack
+# What: Lists bookmark names in your stack.
+# When: Use to see which PRs are in your current stack.
+# Usage: jj prstack
+prstack = ["log", "-r", "trunk::stack & bookmarks()", "--no-graph", "-T", "bookmarks"]
+
+# sprs - Create or update stacked PRs
+# What: For each bookmark in the stack, pushes and creates a PR if needed.
+#       Each PR's base is set to the previous bookmark (or main for the first).
+# When: Use after pushing your stack to create/update the PR chain.
+# Usage: jj sprs
+sprs = ["util", "exec", "--", "sh", "-c", """
+# Iterate through each bookmark in the stack
+for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$'); do
+  echo "Processing $bookmark..."
+  # Push the bookmark
+  jj git push -b "$bookmark" --allow-new
+  # Create PR if it doesn't exist
+  if ! gh pr view "$bookmark" >/dev/null 2>&1; then
+    # Find the parent bookmark to use as base
+    PREV=$(jj log -r "$bookmark-" --no-graph -T 'bookmarks' | head -1)
+    BASE=${PREV:-main}
+    gh pr create --head "$bookmark" --base "$BASE" --fill
+  fi
+done
+"""]
+
+# prs - Generate PR stack summary
+# What: Creates a text summary of all PRs in the stack with links.
+# When: Use to generate content for PR descriptions or Slack updates.
+# Usage: jj prs
+#        # Output:
+#        # ## PR Stack
+#        # - [feature-a](https://github.com/.../1): First feature
+#        # - [feature-b](https://github.com/.../2): Second feature
+prs = ["util", "exec", "--", "sh", "-c", """
+echo "## PR Stack"
+echo ""
+# List bookmarks in reverse order (oldest first)
+for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$' | tac); do
+  PR_URL=$(gh pr view "$bookmark" --json url -q '.url' 2>/dev/null || echo "no PR")
+  DESC=$(jj log -r "$bookmark" --no-graph -T 'description.first_line()' | head -1)
+  echo "- [$bookmark]($PR_URL): $DESC"
+done
+"""]
+
+# uprs - Update all PR comments with stack summary
+# What: Adds/updates a comment on each PR in the stack showing the full stack.
+# When: Use to keep PR comments updated with the current stack status.
+# Usage: jj uprs
+uprs = ["util", "exec", "--", "sh", "-c", """
+# Generate the stack summary
+STACK_INFO=$(jj prs)
+# Update each PR's comment with the summary
+for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$'); do
+  PR_NUM=$(gh pr view "$bookmark" --json number -q '.number' 2>/dev/null)
+  if [ -n "$PR_NUM" ]; then
+    gh pr comment "$PR_NUM" --body "$STACK_INFO" 2>/dev/null || gh pr edit "$PR_NUM" --body "$STACK_INFO"
+  fi
+done
+"""]
+
+# slackstack - Generate Slack-formatted PR stack status
+# What: Creates a Slack message with emoji status indicators for each PR.
+# When: Use to share stack status in Slack channels.
+# Usage: jj slackstack | pbcopy
+#
+# Emoji meanings:
+#   :white_check_mark:      - Merged
+#   :large_yellow_circle:   - Open
+#   :x:                     - Closed
+#   :grey_question:         - Unknown
+slackstack = ["util", "exec", "--", "sh", "-c", """
+echo "*PR Stack*"
+echo ""
+for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$' | tac); do
+  PR_URL=$(gh pr view "$bookmark" --json url -q '.url' 2>/dev/null || echo "no PR")
+  PR_STATE=$(gh pr view "$bookmark" --json state -q '.state' 2>/dev/null || echo "UNKNOWN")
+  DESC=$(jj log -r "$bookmark" --no-graph -T 'description.first_line()' | head -1)
+
+  case $PR_STATE in
+    MERGED) EMOJI=":white_check_mark:" ;;
+    OPEN) EMOJI=":large_yellow_circle:" ;;
+    CLOSED) EMOJI=":x:" ;;
+    *) EMOJI=":grey_question:" ;;
+  esac
+
+  echo "$EMOJI <$PR_URL|$bookmark>: $DESC"
+done
+"""]

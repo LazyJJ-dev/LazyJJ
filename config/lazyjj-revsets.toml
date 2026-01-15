@@ -1,0 +1,63 @@
+# LazyJJ Revset Aliases
+# https://lazyjj.dev
+#
+# Revset aliases for common queries and stack-based workflows.
+#
+# A "stack" is the set of commits from where you branched off trunk
+# to your current position. These revsets help you query and navigate stacks.
+#
+# Visual representation:
+#
+#   trunk ─── A ─── B ─── C ─── @ (current)
+#             ↑                 ↑
+#        branch_off          head
+#             └─────────────────┘
+#                   stack
+
+[revset-aliases]
+
+# trunk - The main integration branch
+# What: Evaluates to the trunk() function, typically main/master.
+# When: Use to reference the main branch or as a base for rebasing.
+# Usage: jj log -r trunk
+#        jj rebase -d trunk
+"trunk" = "trunk()"
+
+# branch_off - Where your current work diverged from trunk
+# What: Finds the fork point between trunk and your current position.
+# When: Use to see where your stack began or to diff against.
+# Usage: jj log -r branch_off
+#        jj diff -f branch_off    # See all changes in your stack
+"branch_off" = "fork_point(trunk() | @)"
+
+# stack_base - Root commit(s) of your current stack
+# What: The first commit(s) after branch_off in your current path.
+# When: Use to identify where your stack starts.
+# Usage: jj log -r stack_base
+"stack_base" = "roots(branch_off+::@)"
+
+# stack - All commits in your current stack
+# What: Every commit from stack_base to the current position and beyond.
+# When: Use to view, rebase, or operate on your entire stack.
+# Usage: jj log -r stack
+#        jj log -r "stack & bookmarks()"   # Stack commits with bookmarks
+"stack" = "stack_base::"
+
+# stacks - All your work-in-progress commits
+# What: All mutable commits authored by you across the entire repo.
+# When: Use to see all your unfinished work, not just the current stack.
+# Usage: jj log -r stacks
+"stacks" = "mine() & mutable()"
+
+# no_description - Commits missing descriptions
+# What: Non-empty commits without a description (excluding root).
+# When: Use to find commits that need descriptions before pushing.
+# Usage: jj log -r no_description
+#        jj log -r "stack & no_description"
+"no_description" = "description(exact:'') ~ root() ~ empty()"
+
+# ghbranch - The bookmark (branch) for the current position
+# What: The most recent bookmark in the ancestry of current position.
+# When: Used internally by GitHub commands to find the PR branch.
+# Usage: jj log -r ghbranch
+"ghbranch" = "heads(::@ & bookmarks())"

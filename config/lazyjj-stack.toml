@@ -1,0 +1,117 @@
+# LazyJJ Stack Workflow
+# https://lazyjj.dev
+#
+# Commands for working with stacks of commits.
+# A "stack" is the set of commits from where you branched off trunk to your current position.
+#
+# Stack Workflow Overview:
+#   1. jj start         - Begin fresh work from trunk
+#   2. Make changes, jj n, repeat
+#   3. jj create <name> - Create a bookmark for the PR
+#   4. jj ss            - Push your stack to remote
+#   5. jj sync          - Fetch updates and rebase your stack
+
+[aliases]
+
+# =============================================================================
+# VIEW STACKS
+# =============================================================================
+
+# stack - View your current stack of commits
+# What: Shows all commits in your stack along with trunk for context.
+# When: Use frequently to visualize your work and its relationship to trunk.
+# Usage: jj stack
+stack = ["log", "-r", "trunk::stack"]
+
+# stackls - View stack with file changes listed
+# What: Shows stack commits with a summary of changed files per commit.
+# When: Use to see which files each commit in your stack touches.
+# Usage: jj stackls
+stackls = ["log", "-r", "trunk::stack", "-s"]
+
+# stacks - View all your work-in-progress stacks
+# What: Shows all mutable commits you've authored across all branches.
+# When: Use to see all your unfinished work, not just current stack.
+# Usage: jj stacks
+stacks = ["log", "-r", "stacks"]
+
+# stacksls - View all stacks with file changes
+# What: Shows all your stacks with file change summaries.
+# When: Use to audit all your in-progress work with file details.
+# Usage: jj stacksls
+stacksls = ["log", "-r", "stacks", "-s"]
+
+# =============================================================================
+# NAVIGATE STACK
+# =============================================================================
+
+# top - Jump to the top of your stack
+# What: Edits the head commit of your stack.
+# When: Use to return to the top after editing commits lower in the stack.
+# Usage: jj top
+top = ["edit", "heads(stack)"]
+
+# bottom - Jump to the bottom of your stack
+# What: Edits the first commit in your stack (stack_base).
+# When: Use to work on the earliest commit in your stack.
+# Usage: jj bottom
+bottom = ["edit", "stack_base"]
+
+# =============================================================================
+# STACK MAINTENANCE
+# =============================================================================
+
+# gc - Garbage collect empty commits in stack
+# What: Abandons empty commits in your stack.
+# When: Use after squashing or when empty commits accumulate.
+# Usage: jj gc
+gc = ["abandon", "empty() & stack"]
+
+# restack - Rebase your stack onto trunk
+# What: Rebases the entire current stack onto the latest trunk.
+# When: Use after fetching to integrate upstream changes.
+# Usage: jj restack
+restack = ["rebase", "-s", "stack_base", "-d", "trunk"]
+
+# =============================================================================
+# BOOKMARK MANAGEMENT
+# =============================================================================
+
+# tug - Move a bookmark to follow your work
+# What: Moves the current bookmark to point at @- (parent commit).
+# When: Use after jj n to keep your bookmark pointing at your latest described commit.
+# Usage: jj describe -m "feature"; jj n; jj tug
+tug = ["bookmark", "move", "--to", "@-"]
+
+# create - Create a new bookmark at @-
+# What: Creates a named bookmark pointing at your previous commit (@-).
+# When: Use to create a PR branch name for your work.
+# Usage: jj create my-feature
+#        jj create fix/bug-123
+create = ["bookmark", "create", "--to", "@-"]
+
+# =============================================================================
+# PUSH TO REMOTE
+# =============================================================================
+
+# ss - Smart Stack push
+# What: Pushes all commits in your stack to remote, allowing new branches.
+# When: Use to push your stack for code review.
+# Usage: jj ss
+ss = ["git", "push", "-r", "stack", "--allow-new"]
+
+# =============================================================================
+# SYNC WORKFLOWS
+# =============================================================================
+
+# sync - Fetch from remote and rebase your stack
+# What: Combines git fetch and restack into one command.
+# When: Use regularly to stay up-to-date with trunk.
+# Usage: jj sync
+sync = ["util", "exec", "--", "sh", "-c", "jj git fetch && jj rebase -s stack_base -d trunk"]
+
+# start - Begin fresh work from trunk
+# What: Fetches latest changes and creates a new commit on trunk.
+# When: Use to start a new feature or bug fix from a clean slate.
+# Usage: jj start
+start = ["util", "exec", "--", "sh", "-c", "jj git fetch && jj new trunk"]

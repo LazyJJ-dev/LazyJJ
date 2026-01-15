@@ -1,0 +1,42 @@
+---
+title: LazyJJ
+description: A ready-to-use Jujutsu distribution with sensible defaults and modern workflows
+template: splash
+hero:
+  tagline: Supercharge your Jujutsu experience with sensible defaults, powerful aliases, and modern workflows
+  image:
+    file: ../../assets/logo-light.svg
+  actions:
+    - text: Get Started
+      link: /introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/lazyjj-dev/lazyjj
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Quick Install
+
+```bash
+curl -fsSL https://lazyjj.dev/install.sh | bash
+```
+
+## Features
+
+<CardGrid stagger>
+  <Card title="Core Aliases" icon="pencil">
+    Essential shortcuts like `st`, `d`, `l`, `n`, `e` for everyday JJ usage.
+  </Card>
+  <Card title="Stack Workflow" icon="list-format">
+    Navigate and manage commit stacks with `stack`, `top`, `bottom`, `sync`.
+  </Card>
+  <Card title="GitHub Integration" icon="github">
+    Create and manage stacked PRs with `prv`, `pro`, `sprs`.
+  </Card>
+  <Card title="Claude Integration" icon="rocket">
+    AI-assisted development with `clstart`, `clstop`, `clreview`.
+  </Card>
+</CardGrid>
