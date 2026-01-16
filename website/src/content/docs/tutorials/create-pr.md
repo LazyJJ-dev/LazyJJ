@@ -60,6 +60,8 @@ jj bookmark-create auth-feature
 
 This creates a bookmark pointing at your current commit.
 
+> **Note about Bookmarks vs Branches**: JJ calls them "bookmarks" while GitHub calls them "branches." They're the same thing. Why the different term? JJ bookmarks don't auto-follow like Git branches—you must manually update them. This is THE most common confusion for Git users. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) for details.
+
 ## Step 5: Push and Create the PR
 
 Push your changes and create a PR in one command:

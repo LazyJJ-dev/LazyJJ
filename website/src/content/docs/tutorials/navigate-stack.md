@@ -112,13 +112,18 @@ In JJ, you're always "inside" a commit. When you navigate:
 - Any file changes modify `xyz` directly
 - Commits above `xyz` are automatically rebased
 
+### What Navigation Means
+
+- **In Git**: Checking out branches, switching between working trees
+- **In JJ**: Entering a commit to edit it directly
+
 This is different from Git where you'd need to:
 1. Checkout the branch
 2. Make changes
 3. Commit --amend
 4. Rebase dependent branches
 
-JJ does all of this automatically.
+JJ does all of this automatically. See the [Mental Model guide](/guides/mental-model/) for deeper explanation.
 
 ## Working with Multiple Stacks
 
@@ -148,6 +153,8 @@ Change IDs are unique, so you only need enough characters to identify them:
 ```bash
 jj edit xy    # Works if "xy" uniquely identifies a commit
 ```
+
+**Tip**: Change IDs are visible in `jj log` output. The highlighted first few characters are usually enough to uniquely identify a commit.
 
 ### Visual Stack View
 

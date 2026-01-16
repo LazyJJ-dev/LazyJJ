@@ -108,6 +108,39 @@ jj pr-stack-slack
 # :white_check_mark: <url|db-schema>: Add database schema
 ```
 
+## Understanding Bookmarks and Branches
+
+One of the most common sources of confusion:
+
+- **JJ calls them**: Bookmarks
+- **GitHub calls them**: Branches
+- **They're the same thing**
+
+### Why Bookmarks Don't Auto-Follow
+
+Unlike Git branches, JJ bookmarks stay where you set them:
+
+```bash
+jj bookmark-create my-feature  # Bookmark at current commit
+jj new -m "More work"          # Create new commit
+jj log
+# my-feature is still at the old commit!
+
+# Update manually:
+jj bookmark set my-feature -r @
+```
+
+Research shows 11 out of 20 JJ resources mention this as a common confusion. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) for details.
+
+### The `ghbranch` Revset
+
+LazyJJ provides a revset to find the current bookmark for GitHub:
+
+```bash
+# See which bookmark will be used
+jj log -r ghbranch
+```
+
 ## Utility Commands
 
 | Command | Shortcut | Purpose |
@@ -154,3 +187,7 @@ If you need to set a PR's base manually:
 ```bash
 gh pr edit my-branch --base other-branch
 ```
+
+### My Bookmark Didn't Update
+
+If you're wondering why your bookmark didn't move when you created a new commit, see [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow). This is THE most common confusion for Git users transitioning to JJ.

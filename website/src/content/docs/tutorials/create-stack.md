@@ -46,6 +46,8 @@ jj bookmark-create db-schema
 jj new
 ```
 
+> **Notice**: No `git add` needed! In JJ, changes are automatically part of the commit. This feels strange initially but becomes natural. See [Mental Model](/guides/mental-model/) for why this works.
+
 ## Step 3: Second Commit
 
 Build on the first commit:
@@ -166,6 +168,19 @@ jj bookmark-create feature/03-api
 ### Don't Forget `jj new`
 
 After describing a commit, run `jj new` before starting the next set of changes. Otherwise, you'll keep modifying the same commit.
+
+This is a common mistake—see [Common Mistakes](/guides/common-mistakes/#mistake-5-forgetting-jj-new-after-describing-a-commit) for details.
+
+### What if I Forgot `jj new`?
+
+If you accidentally kept editing the same commit:
+
+```bash
+# Split the commit
+jj split
+# Choose what belongs in first commit
+# Rest becomes a new commit
+```
 
 ### View All Your Stacks
 

@@ -84,6 +84,33 @@ jj claude-checkpoint "got auth working"
 
 This describes the current commit and creates a new one.
 
+## Why Claude + JJ is Powerful
+
+The combination of Claude and JJ creates unique advantages:
+
+### 1. Safe Experimentation
+
+JJ's operation log means Claude can try things without fear. If Claude makes a mistake:
+
+```bash
+jj undo  # Reverse Claude's last action
+jj op log  # See what Claude did
+jj op restore <id>  # Jump back if needed
+```
+
+### 2. First-Class Conflicts
+
+JJ's conflict model means Claude can attempt merges or rebases without blocking you. If conflicts arise, they're just marked—you can keep working.
+
+### 3. Natural Language → Stack Operations
+
+Claude understands stack-based workflows. You can ask:
+- "Split this change into 3 stacked commits"
+- "Rebase my stack onto main and resolve conflicts"
+- "Edit the second commit in my stack to fix the bug"
+
+Claude can manipulate your stack directly using JJ's powerful commands.
+
 ## Workflow Example
 
 A typical AI-assisted development session:
