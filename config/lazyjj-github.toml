@@ -10,6 +10,9 @@
 #   3. jj pr-stack-summary     - Generate a summary of the stack
 #   4. jj pr-stack-update    - Update PR comments with the stack summary
 
+[revset-aliases]
+ghbranch = "heads(::@ & bookmarks())"
+
 [aliases]
 
 # =============================================================================
@@ -21,14 +24,18 @@
 # When: Used internally by other GitHub commands to target the right repo.
 # Usage: jj github-repo
 #        # Output: "lazyjj-dev/lazyjj"
-github-repo = ["util", "exec", "--", "sh", "-c", "jj git remote list | grep origin | awk '{print $2}' | sed 's/.*github.com[:\\/]//' | sed 's/.git$//'"]
+github-repo = ["util", "exec", "--", "bash", "-c", """
+  jj git remote list | rg '^origin .*github.com[:/](.*)$' -o -r '$1' | sed -e 's/.git$//'
+  """, ""]
 
-# github-cli - Run GitHub CLI command
+# gh - Run GitHub CLI command
 # What: Wrapper for `gh` CLI.
 # When: Use to run any gh command.
-# Usage: jj github-cli pr list
-#        jj github-cli issue view 123
-github-cli = ["util", "exec", "--", "gh"]
+# Usage: jj gh pr list
+#        jj gh issue view 123
+gh = ["util", "exec", "--", "bash", "-c", """
+  gh $@ -R $(jj github-repo)
+  """, ""]
 
 # =============================================================================
 # PULL REQUEST VIEWING
@@ -38,13 +45,17 @@ github-cli = ["util", "exec", "--", "gh"]
 # What: Shows details of the PR for the current bookmark.
 # When: Use to check PR status, reviews, and checks.
 # Usage: jj pr-view
-pr-view = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\""]
+pr-view = ["util", "exec", "--", "bash", "-c", """
+  set -e
+  branch=$(jj ghbranch)
+  jj gh pr view "$branch" "$@"
+  """, ""]
 
 # pr-open - Open current PR in browser
 # What: Opens the PR for current bookmark in your default browser.
 # When: Use to quickly jump to the PR on GitHub.
 # Usage: jj pr-open
-pr-open = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\" --web"]
+pr-open = ["pr-view", "-w"]
 
 # =============================================================================
 # STACKED PRS
@@ -54,28 +65,30 @@ pr-open = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no
 # What: Lists bookmark names in your stack.
 # When: Use to see which PRs are in your current stack.
 # Usage: jj pr-stack
-pr-stack = ["log", "-r", "trunk::stack & bookmarks()", "--no-graph", "-T", "bookmarks"]
+pr-stack = [
+  "log",
+  "-r",
+  "stack- & mutable() & bookmarks() | trunk()",
+  "-T",
+  "bookmarks.map(|c| c.name()) ++ '\n'",
+  "--no-pager",
+]
 
 # pr-stack-create - Create or update stacked PRs
 # What: For each bookmark in the stack, pushes and creates a PR if needed.
 #       Each PR's base is set to the previous bookmark (or main for the first).
 # When: Use after pushing your stack to create/update the PR chain.
 # Usage: jj pr-stack-create
-pr-stack-create = ["util", "exec", "--", "sh", "-c", """
-# Iterate through each bookmark in the stack
-for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$'); do
-  echo "Processing $bookmark..."
-  # Push the bookmark
-  jj git push -b "$bookmark" --allow-new
-  # Create PR if it doesn't exist
-  if ! gh pr view "$bookmark" >/dev/null 2>&1; then
-    # Find the parent bookmark to use as base
-    PREV=$(jj log -r "$bookmark-" --no-graph -T 'bookmarks' | head -1)
-    BASE=${PREV:-main}
-    gh pr create --head "$bookmark" --base "$BASE" --fill
-  fi
-done
-"""]
+pr-stack-create = ["util", "exec", "--", "bash", "-c", """
+  set -e
+  while read -r bm; do
+    bm_branch=${bm%\\*}
+    base_bm=$(jj log -r "stack- & bookmarks() & heads(::bookmarks(exact:'$bm_branch')- & bookmarks())" -T 'bookmarks' --no-graph --no-pager)
+    base_branch=${base_bm%\\*}
+    jj gh pr edit "$bm_branch" --base "$base_branch" || \
+      jj gh pr create --head "$bm_branch" --base "$base_branch" -w
+  done < <(jj pr-stack --reversed --no-graph | rg -v '^main$')
+  """, ""]
 
 # pr-stack-summary - Generate PR stack summary
 # What: Creates a text summary of all PRs in the stack with links.
@@ -85,58 +98,123 @@ done
 #        # ## PR Stack
 #        # - [feature-a](https://github.com/.../1): First feature
 #        # - [feature-b](https://github.com/.../2): Second feature
-pr-stack-summary = ["util", "exec", "--", "sh", "-c", """
-echo "## PR Stack"
-echo ""
-# List bookmarks in reverse order (oldest first)
-for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$' | tac); do
-  PR_URL=$(gh pr view "$bookmark" --json url -q '.url' 2>/dev/null || echo "no PR")
-  DESC=$(jj log -r "$bookmark" --no-graph -T 'description.first_line()' | head -1)
-  echo "- [$bookmark]($PR_URL): $DESC"
-done
-"""]
+pr-stack-summary = ["util", "exec", "--", "bash", "-c", """
+  set -e
+  echo "## PR Stack"
+  echo ""
+  # List bookmarks in reverse order (oldest first)
+  while read -r bm; do
+    bm_branch=${bm%\\*}
+    PR_URL=$(jj gh pr view "$bm_branch" --json url -q '.url' 2>/dev/null || echo "no PR")
+    DESC=$(jj log -r "$bm_branch" --no-graph -T 'description.first_line()' | head -1)
+    echo "- [$bm_branch]($PR_URL): $DESC"
+  done < <(jj pr-stack --reversed --no-graph | rg -v '^main$' | tac)
+  """, ""]
 
 # pr-stack-update - Update all PR comments with stack summary
 # What: Adds/updates a comment on each PR in the stack showing the full stack.
 # When: Use to keep PR comments updated with the current stack status.
 # Usage: jj pr-stack-update
-pr-stack-update = ["util", "exec", "--", "sh", "-c", """
-# Generate the stack summary
-STACK_INFO=$(jj pr-stack-summary)
-# Update each PR's comment with the summary
-for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$'); do
-  PR_NUM=$(gh pr view "$bookmark" --json number -q '.number' 2>/dev/null)
-  if [ -n "$PR_NUM" ]; then
-    gh pr comment "$PR_NUM" --body "$STACK_INFO" 2>/dev/null || gh pr edit "$PR_NUM" --body "$STACK_INFO"
-  fi
-done
-"""]
+pr-stack-update = ["util", "exec", "--", "bash", "-c", """
+  set -e
+  comment=$(jj pr-stack-summary)
+  while read -r bm; do
+    bm_branch=${bm%\\*}
+    printf '%s\n' "$comment" | \
+      jj gh pr comment --edit-last --create-if-none -F - "$bm_branch"
+  done < <(jj pr-stack --reversed --no-graph | rg -v '^main$')
+  """, ""]
 
-# pr-stack-slack - Generate Slack-formatted PR stack status
-# What: Creates a Slack message with emoji status indicators for each PR.
-# When: Use to share stack status in Slack channels.
-# Usage: jj pr-stack-slack | pbcopy
+# =============================================================================
+# PR FORMATTING (Enhanced)
+# =============================================================================
+
+# _format_pr - Internal helper to format a single PR with detailed status
+# What: Formats a PR with CI status, review status, number, and title.
+# When: Used internally by pr-stack-format and pr-stacks-format.
+# Usage: jj _format_pr <bookmark>
 #
-# Emoji meanings:
-#   :white_check_mark:      - Merged
-#   :large_yellow_circle:   - Open
-#   :x:                     - Closed
-#   :grey_question:         - Unknown
-pr-stack-slack = ["util", "exec", "--", "sh", "-c", """
-echo "*PR Stack*"
-echo ""
-for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$' | tac); do
-  PR_URL=$(gh pr view "$bookmark" --json url -q '.url' 2>/dev/null || echo "no PR")
-  PR_STATE=$(gh pr view "$bookmark" --json state -q '.state' 2>/dev/null || echo "UNKNOWN")
-  DESC=$(jj log -r "$bookmark" --no-graph -T 'description.first_line()' | head -1)
+# Status indicators:
+#   CI: 🔴 (failed), ⏱️ (in progress), 🟢 (passed)
+#   Review: 🏗️ (draft), ⏳ (needs review), ✅ (approved), ✏️ (changes), 🛬 (merged)
+_format_pr = [
+  "util",
+  "--ignore-working-copy",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  """
+  set -e
+  bm_branch="$1"
+  prstatus=$(mktemp)
+  jj --ignore-working-copy gh pr view --json state,title,reviewDecision,isDraft,url,number,statusCheckRollup "$bm_branch" > $prstatus 2>/dev/null || exit 0
+  cat $prstatus | jq -r '
+    . as $pr |
+      "- " +
+(if ($pr.statusCheckRollup | length) > 0 then
+   if ($pr.statusCheckRollup | map(.conclusion) | index("FAILURE")) then
+     "🔴"
+   elif ($pr.statusCheckRollup | map(.status) | index("IN_PROGRESS")) then
+     "⏱️"
+   else "🟢" end
+ else "" end) +
+      (if $pr.isDraft then "🏗️"
+        elif $pr.state == "MERGED" then "🛬"
+        elif $pr.reviewDecision == "" then "⏳"
+        elif $pr.reviewDecision == "REVIEW_REQUIRED" then "⏳"
+        elif $pr.state == "OPEN" and $pr.reviewDecision == "APPROVED" then "✅"
+        elif $pr.state == "OPEN" and $pr.reviewDecision == "CHANGES_REQUESTED" then "✏️"
+        elif $pr.state == "OPEN" and $pr.reviewDecision != "" then $pr.reviewDecision
+        else "" end) +
+      " [#" + (.number | tostring) + "](" + .url + ") " + .title
+    '
+  """,
+  "",
+]
 
-  case $PR_STATE in
-    MERGED) EMOJI=":white_check_mark:" ;;
-    OPEN) EMOJI=":large_yellow_circle:" ;;
-    CLOSED) EMOJI=":x:" ;;
-    *) EMOJI=":grey_question:" ;;
-  esac
+# pr-stack-format - Format current stack PRs for Slack/Markdown
+# What: Generates markdown-formatted status for all PRs in current stack.
+# When: Use to share detailed stack status with CI and review info.
+# Usage: jj pr-stack-format | pbcopy
+#        # Then paste into Slack/GitHub
+pr-stack-md = [
+  "util",
+  "--ignore-working-copy",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  """
+  set -e
+  while read -r bm; do
+    bm_branch=${bm%\\*}
+    jj _format_pr "$bm_branch"
+  done < <(jj pr-stack --reversed --no-graph --ignore-working-copy | rg -v '^main$')
+  """,
+  "",
+]
 
-  echo "$EMOJI <$PR_URL|$bookmark>: $DESC"
-done
-"""]
+# pr-stacks-format - Format ALL mutable bookmarked PRs for Slack/Markdown
+# What: Generates markdown-formatted status for all mutable PRs in repo.
+# When: Use to get overview of all your PRs across all stacks.
+# Usage: jj pr-stacks-format | pbcopy
+pr-stacks-all-md = [
+  "util",
+  "--ignore-working-copy",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  """
+  set -e
+  while read -r bm; do
+    bm_branch=${bm%\\*}
+    if [ "$bm_branch" = "main" ]; then
+      continue
+    fi
+    jj _format_pr "$bm_branch"
+  done < <(jj log -r "mutable() & bookmarks()" -T "bookmarks.map(|c| c.name()) ++ '\n'" --no-pager --no-graph --ignore-working-copy)
+  """,
+  "",
+]

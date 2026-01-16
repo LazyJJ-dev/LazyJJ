@@ -2,7 +2,7 @@
 # https://lazyjj.dev
 #
 # Aliases that add value beyond built-in JJ commands.
-# For shortcuts like `st`, `d`, `n`, `e`, see lazyjj-shortcuts.toml.
+# For shortcuts, see lazyjj-shortcuts.toml.
 
 [aliases]
 
@@ -16,7 +16,7 @@ diff-summary = ["diff", "--summary", "--no-pager"]
 # What: Outputs just the names of changed files, one per line.
 # When: Useful for scripting or piping to other commands.
 # Usage: jj diff-files
-#        jj diff-files | xargs ...
+#        jj diff-files | xargs nvim
 diff-files = ["diff", "--name-only", "--no-pager"]
 
 # log-short - Quick log (last 10 commits)
@@ -24,16 +24,3 @@ diff-files = ["diff", "--name-only", "--no-pager"]
 # When: Use for a quick glance at recent history without scrolling.
 # Usage: jj log-short
 log-short = ["log", "--limit", "10"]
-
-# log-history - Log without pager
-# What: Shows the commit log without invoking a pager.
-# When: Useful for piping output or quick terminal viewing.
-# Usage: jj log-history
-#        jj log-history | grep "pattern"
-log-history = ["log", "--no-pager"]
-
-# git-fetch - Git fetch
-# What: Fetches changes from all Git remotes.
-# When: Use to sync with remote repositories before rebasing.
-# Usage: jj git-fetch
-git-fetch = ["git", "fetch"]

@@ -7,7 +7,7 @@
 # Stack Workflow Overview:
 #   1. jj stack-start         - Begin fresh work from trunk
 #   2. Make changes, jj new-commit, repeat
-#   3. jj bookmark-create <name> - Create a bookmark for the PR
+#   3. jj create <name> - Create a bookmark for the PR
 #   4. jj stack-submit            - Push your stack to remote
 #   5. jj stack-sync          - Fetch updates and rebase your stack
 
@@ -49,13 +49,7 @@ stacks-all-files = ["log", "-r", "stacks", "-s"]
 # What: Edits the head commit of your stack.
 # When: Use to return to the top after editing commits lower in the stack.
 # Usage: jj stack-top
-stack-top = ["edit", "heads(stack)"]
-
-# stack-bottom - Jump to the bottom of your stack
-# What: Edits the first commit in your stack (stack_base).
-# When: Use to work on the earliest commit in your stack.
-# Usage: jj stack-bottom
-stack-bottom = ["edit", "stack_base"]
+stack-top = ["new", "heads(stack)"]
 
 # =============================================================================
 # STACK MAINTENANCE
@@ -67,11 +61,17 @@ stack-bottom = ["edit", "stack_base"]
 # Usage: jj stack-gc
 stack-gc = ["abandon", "empty() & stack"]
 
-# stack-rebase - Rebase your stack onto trunk
+# restack - Rebase your stack onto trunk
 # What: Rebases the entire current stack onto the latest trunk.
 # When: Use after fetching to integrate upstream changes.
-# Usage: jj stack-rebase
-stack-rebase = ["rebase", "-s", "stack_base", "-d", "trunk"]
+# Usage: jj restack
+restack = ["rebase", "-s", "stack_base", "-d", "trunk"]
+
+# restack-all - Rebase all stacks onto trunk
+# What: Rebases all mutable stacks you've authored onto the latest trunk.
+# When: Use to update all your in-progress work with upstream changes.
+# Usage: jj restack-all
+restack-all = ["rebase", "-b", "roots(stacks)", "-d", "trunk()", "--skip-emptied"]
 
 # =============================================================================
 # BOOKMARK MANAGEMENT
@@ -79,16 +79,16 @@ stack-rebase = ["rebase", "-s", "stack_base", "-d", "trunk"]
 
 # bookmark-tug - Move a bookmark to follow your work
 # What: Moves the current bookmark to point at @- (parent commit).
-# When: Use after jj new-commit to keep your bookmark pointing at your latest described commit.
-# Usage: jj describe -m "feature"; jj new-commit; jj bookmark-tug
-bookmark-tug = ["bookmark", "move", "--to", "@-"]
+# When: Use after jj commit to keep your bookmark pointing at your latest described commit.
+# Usage: jj commit -m "feature"; jj tug
+tug = ["bookmark", "move", "--to", "@-"]
 
 # bookmark-create - Create a new bookmark at @-
 # What: Creates a named bookmark pointing at your previous commit (@-).
 # When: Use to create a PR branch name for your work.
-# Usage: jj bookmark-create my-feature
-#        jj bookmark-create fix/bug-123
-bookmark-create = ["bookmark", "create", "--to", "@-"]
+# Usage: jj create my-feature
+#        jj create fix/bug-123
+create = ["bookmark", "create", "--to", "@-"]
 
 # =============================================================================
 # PUSH TO REMOTE
@@ -115,3 +115,26 @@ stack-sync = ["util", "exec", "--", "sh", "-c", "jj git fetch && jj rebase -s st
 # When: Use to start a new feature or bug fix from a clean slate.
 # Usage: jj stack-start
 stack-start = ["util", "exec", "--", "sh", "-c", "jj git fetch && jj new trunk"]
+
+# =============================================================================
+# STACK DIFF ALIASES
+# =============================================================================
+
+# stack-diff - Show diff from the beginning of the stack
+# What: Displays the full diff from where the stack branched off.
+# When: Use to see all changes in your entire stack.
+# Usage: jj stack-diff
+stack-diff = ["diff", "-f", "branch_off"]
+
+# stack-diff-summary - Show diff summary from the beginning of the stack
+# What: Shows a compact one-line-per-file summary for entire stack.
+# When: Use for a quick overview of all stack changes.
+# Usage: jj stack-diff-summary
+stack-diff-summary = ["diff-summary", "-f", "branch_off"]
+
+# stack-diff-files - List changed files from the beginning of the stack
+# What: Lists only filenames that changed in entire stack.
+# When: Use to see which files changed across your whole stack.
+# Usage: jj stack-diff-files
+stack-diff-files = ["diff-files", "-f", "branch_off"]
+

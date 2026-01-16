@@ -14,20 +14,10 @@ cat << 'EOF'
 LazyJJ - Supercharged JJ Configuration
 https://lazyjj.dev
 
-CORE ALIASES
-  st          status
-  d           diff
-  l           log (last 10)
-  ll          log (full)
-  n           new commit
-  e           edit commit
-  gf          git fetch
-
 STACK WORKFLOW
   stack       view current stack
   stacks      view all your stacks
   top         go to top of stack
-  bottom      go to bottom of stack
   sync        fetch + rebase onto trunk
   start       fetch + new commit from trunk
   ss          push stack to remote
@@ -63,13 +53,13 @@ fi
 echo "Updating LazyJJ..."
 cd "$LAZYJJ_DIR"
 
-if [ -d ".git" ]; then
-  git pull --ff-only
-elif [ -d ".jj" ]; then
+if [ -d ".jj" ]; then
   jj git fetch
   jj new trunk
+elif [ -d ".git" ]; then
+  git pull --ff-only
 else
-  echo "LazyJJ directory is not a git/jj repo. Re-run install:"
+  echo "LazyJJ directory is not a jj/git repo. Re-run install:"
   echo "  curl -fsSL https://lazyjj.dev/install.sh | bash"
   exit 1
 fi
