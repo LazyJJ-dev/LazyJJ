@@ -134,4 +134,4 @@ LazyJJ is better if you:
 
 ## Ready to Switch?
 
-If you're coming from Graphite, check out the [Graphite Migration](/guides/graphite-migration/) guide for a command-by-command mapping.
+If you're coming from Graphite, check out the [From Graphite to LazyJJ](/guides/from-graphite/) guide for a command-by-command mapping and migration help.

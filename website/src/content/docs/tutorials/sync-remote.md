@@ -59,6 +59,14 @@ Unlike Git, JJ doesn't block you from continuing work when conflicts exist. You 
 - Resolve conflicts later
 - See exactly which commits have conflicts with `jj log`
 
+See the [Conflicts tutorial](/tutorials/resolve-conflicts/) for JJ's first-class conflict handling. This is one of JJ's superpowers—conflicts don't stop you.
+
+### Why Sync is Easier in JJ
+
+**Git workflow**: `pull` → conflicts → **blocked** → resolve → continue
+
+**JJ workflow**: `sync` → conflicts → keep working → resolve when convenient
+
 ## After a PR Merges
 
 When someone merges your first PR:

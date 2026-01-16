@@ -23,10 +23,32 @@ export default defineConfig({
           ],
         },
         {
+          label: "Guides",
+          items: [
+            { label: "Understanding JJ's Mental Model", slug: "guides/mental-model" },
+            { label: "The Operation Log", slug: "guides/operation-log" },
+            { label: "Git vs JJ", slug: "guides/git-differences" },
+            { label: "LazyJJ vs Graphite", slug: "guides/graphite-comparison" },
+            { label: "From Graphite to LazyJJ", slug: "guides/from-graphite" },
+            { label: "Common Mistakes", slug: "guides/common-mistakes" },
+          ],
+        },
+        {
+          label: "Tutorials",
+          items: [
+            { label: "Create a Stack", slug: "tutorials/create-stack" },
+            { label: "Navigate Your Stack", slug: "tutorials/navigate-stack" },
+            { label: "Edit Mid-Stack Commits", slug: "tutorials/edit-mid-stack" },
+            { label: "Working with Conflicts", slug: "tutorials/resolve-conflicts" },
+            { label: "Create a Pull Request", slug: "tutorials/create-pr" },
+            { label: "Sync with Remote", slug: "tutorials/sync-remote" },
+          ],
+        },
+        {
           label: "Reference",
           items: [
             { label: "Aliases", slug: "reference/aliases" },
-            { label: "Revsets", slug: "reference/revsets" },
+            { label: "Advanced Revsets", slug: "reference/revsets-advanced" },
             { label: "Stack Workflow", slug: "reference/stack" },
           ],
         },

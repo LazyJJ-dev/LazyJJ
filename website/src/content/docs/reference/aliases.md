@@ -5,6 +5,15 @@ description: Complete reference for LazyJJ aliases
 
 LazyJJ provides aliases that add value beyond built-in JJ commands. For shortcuts to native commands (`st`, `d`, `n`, `e`, `ll`), see `lazyjj-shortcuts.toml`.
 
+## Philosophy: Value-Add Over Shortcuts
+
+LazyJJ's approach to aliases:
+
+- **Value-add aliases**: Do something Git or vanilla JJ don't (these are in the main reference)
+- **Pure shortcuts**: Just shorter names for existing commands (separate file)
+
+This keeps the main aliases file focused on LazyJJ's unique contributions to the JJ workflow.
+
 ## Value-Add Aliases
 
 These aliases add flags or combine commands beyond what JJ provides natively:

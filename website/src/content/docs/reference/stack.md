@@ -13,6 +13,20 @@ A "stack" is a series of commits from where you diverged from trunk to your curr
 - Stacked pull requests
 - Code review workflows
 
+## Why Stacks Work Better in JJ
+
+Unlike Git or Graphite, stacks are **native** to JJ's model:
+
+- **Git**: Branches fight the stacking workflow. Rebasing is manual and error-prone. You constantly juggle branch names and worry about detached HEAD states.
+- **Graphite**: Stacks are metadata layered on top of Git. Break the discipline (one commit per branch), and the stack breaks. The "stack" is actually a queue fighting Git's branch model.
+- **JJ**: Stacks are the natural structure of the commit graph. Edit any commit, descendants automatically rebase. Change IDs provide stable handles. It's how JJ works, not a layer on top.
+
+Research insight: Graphite's "stack" metaphor struggles because Git's branch model wasn't designed for it. JJ's change-based model makes stacking natural.
+
+For detailed understanding, see:
+- [Mental Model guide](/guides/mental-model/) - Why JJ's approach works
+- [Common Mistakes](/guides/common-mistakes/) - Pitfalls to avoid
+
 ## Viewing Stacks
 
 | Command | Shortcut | Purpose |
