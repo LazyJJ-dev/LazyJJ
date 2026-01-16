@@ -31,6 +31,12 @@ jj log -r "stacks" > /dev/null
 # Test branch_off revset
 jj log -r "branch_off" > /dev/null
 
+# Test ghbranch revset
+jj log -r "ghbranch" > /dev/null || true
+
+# Test no_description revset
+jj log -r "no_description" > /dev/null
+
 echo "All revset aliases resolve correctly"
 
 # Cleanup

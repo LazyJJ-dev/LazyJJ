@@ -1,0 +1,5 @@
+[tools]
+jj = "latest"
+
+[env]
+JJ_CONFIG = "{{env.HOME}}/.config/jj/conf.d:config"

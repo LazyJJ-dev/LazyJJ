@@ -109,33 +109,6 @@ for file in $CONFLICTS; do
 done
 """]
 
-# claude-review - Review a PR using Claude
-# What: Fetches a PR diff and asks Claude to review it.
-# When: Use to get AI-assisted code review of a pull request.
-# Usage: jj claude-review 123
-#        jj claude-review feature-branch
-#
-# How it works:
-#   1. Uses gh CLI to fetch the PR diff
-#   2. Pipes diff to Claude with review prompt
-claude-review = ["util", "exec", "--", "sh", "-c", """
-PR="${1:-$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1)}"
-if [ -z "$PR" ]; then
-  echo "Usage: jj claude-review <pr-number-or-branch>"
-  exit 1
-fi
-
-echo "Fetching PR diff..."
-DIFF=$(gh pr diff "$PR" 2>/dev/null)
-if [ -z "$DIFF" ]; then
-  echo "Could not fetch PR diff"
-  exit 1
-fi
-
-echo "Starting Claude review..."
-echo "$DIFF" | claude --prompt "Review this pull request diff. Look for bugs, security issues, and suggest improvements."
-"""]
-
 # claude-checkpoint - Create a checkpoint commit for Claude's work
 # What: Describes current commit and creates a new one.
 #       Used to save Claude's progress at logical stopping points.

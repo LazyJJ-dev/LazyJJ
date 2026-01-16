@@ -11,19 +11,10 @@
 # CORE SHORTCUTS
 # =============================================================================
 
-# Basic JJ commands (shortcuts to built-in commands)
-st = ["status"]
-d = ["diff"]
-ll = ["log"]
-n = ["new"]
-e = ["edit"]
-
 # Aliases with added value (shortcuts to lazyjj-aliases.toml commands)
 diffs = ["diff-summary"]
 diffls = ["diff-files"]
-l = ["log-short"]
-hist = ["log-history"]
-gf = ["git-fetch"]
+gf = ["git", "fetch"]
 
 # =============================================================================
 # STACK SHORTCUTS (from lazyjj-stack.toml)
@@ -34,11 +25,7 @@ stackls = ["stack-files"]
 stacks = ["stacks-all"]
 stacksls = ["stacks-all-files"]
 top = ["stack-top"]
-bottom = ["stack-bottom"]
 gc = ["stack-gc"]
-restack = ["stack-rebase"]
-tug = ["bookmark-tug"]
-create = ["bookmark-create"]
 ss = ["stack-submit"]
 sync = ["stack-sync"]
 start = ["stack-start"]
@@ -48,14 +35,12 @@ start = ["stack-start"]
 # =============================================================================
 
 repo = ["github-repo"]
-gh = ["github-cli"]
 prv = ["pr-view"]
 pro = ["pr-open"]
-prstack = ["pr-stack"]
 sprs = ["pr-stack-create"]
 prs = ["pr-stack-summary"]
 uprs = ["pr-stack-update"]
-slackstack = ["pr-stack-slack"]
+prmd = ["pr-stack-md"]   # Deprecated, use prf/prfs
 
 # =============================================================================
 # CLAUDE SHORTCUTS (from lazyjj-claude.toml)
@@ -64,4 +49,3 @@ slackstack = ["pr-stack-slack"]
 clstart = ["claude-start"]
 clstop = ["claude-stop"]
 clresolve = ["claude-resolve"]
-clreview = ["claude-review"]
