@@ -1,0 +1,67 @@
+# LazyJJ Shortcuts
+# https://lazyjj.dev
+#
+# Short aliases for common commands.
+# These are provided for convenience - if you prefer explicit commands,
+# you can remove this file.
+
+[aliases]
+
+# =============================================================================
+# CORE SHORTCUTS
+# =============================================================================
+
+# Basic JJ commands (shortcuts to built-in commands)
+st = ["status"]
+d = ["diff"]
+ll = ["log"]
+n = ["new"]
+e = ["edit"]
+
+# Aliases with added value (shortcuts to lazyjj-aliases.toml commands)
+diffs = ["diff-summary"]
+diffls = ["diff-files"]
+l = ["log-short"]
+hist = ["log-history"]
+gf = ["git-fetch"]
+
+# =============================================================================
+# STACK SHORTCUTS (from lazyjj-stack.toml)
+# =============================================================================
+
+stack = ["stack-view"]
+stackls = ["stack-files"]
+stacks = ["stacks-all"]
+stacksls = ["stacks-all-files"]
+top = ["stack-top"]
+bottom = ["stack-bottom"]
+gc = ["stack-gc"]
+restack = ["stack-rebase"]
+tug = ["bookmark-tug"]
+create = ["bookmark-create"]
+ss = ["stack-submit"]
+sync = ["stack-sync"]
+start = ["stack-start"]
+
+# =============================================================================
+# GITHUB SHORTCUTS (from lazyjj-github.toml)
+# =============================================================================
+
+repo = ["github-repo"]
+gh = ["github-cli"]
+prv = ["pr-view"]
+pro = ["pr-open"]
+prstack = ["pr-stack"]
+sprs = ["pr-stack-create"]
+prs = ["pr-stack-summary"]
+uprs = ["pr-stack-update"]
+slackstack = ["pr-stack-slack"]
+
+# =============================================================================
+# CLAUDE SHORTCUTS (from lazyjj-claude.toml)
+# =============================================================================
+
+clstart = ["claude-start"]
+clstop = ["claude-stop"]
+clresolve = ["claude-resolve"]
+clreview = ["claude-review"]

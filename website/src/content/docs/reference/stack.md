@@ -15,122 +15,122 @@ A "stack" is a series of commits from where you diverged from trunk to your curr
 
 ## Viewing Stacks
 
-| Alias | Purpose |
-|-------|---------|
-| `stack` | View current stack with trunk context |
-| `stackls` | Stack with file changes listed |
-| `stacks` | View all your stacks |
-| `stacksls` | All stacks with file changes |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `stack-view` | `stack` | View current stack with trunk context |
+| `stack-files` | `stackls` | Stack with file changes listed |
+| `stacks-all` | `stacks` | View all your stacks |
+| `stacks-all-files` | `stacksls` | All stacks with file changes |
 
 ```bash
 # See your current stack
-jj stack
+jj stack-view
 
 # See what files changed in each commit
-jj stackls
+jj stack-files
 
 # See all your work in progress
-jj stacks
+jj stacks-all
 ```
 
 ## Navigation
 
-| Alias | Purpose |
-|-------|---------|
-| `top` | Jump to top of stack |
-| `bottom` | Jump to bottom of stack |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `stack-top` | `top` | Jump to top of stack |
+| `stack-bottom` | `bottom` | Jump to bottom of stack |
 
 ```bash
 # Go to the latest commit in your stack
-jj top
+jj stack-top
 
 # Go to the first commit in your stack
-jj bottom
+jj stack-bottom
 ```
 
 ## Syncing with Trunk
 
-| Alias | Purpose |
-|-------|---------|
-| `sync` | Fetch and rebase onto trunk |
-| `start` | Fetch and start fresh from trunk |
-| `restack` | Rebase stack onto trunk (no fetch) |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `stack-sync` | `sync` | Fetch and rebase onto trunk |
+| `stack-start` | `start` | Fetch and start fresh from trunk |
+| `stack-rebase` | `restack` | Rebase stack onto trunk (no fetch) |
 
 ```bash
 # Update your stack with latest trunk
-jj sync
+jj stack-sync
 
 # Start a new stack from latest trunk
-jj start
+jj stack-start
 
 # Rebase without fetching
-jj restack
+jj stack-rebase
 ```
 
 ## Pushing and Bookmarks
 
-| Alias | Purpose |
-|-------|---------|
-| `ss` | Smart push - push stack to remote |
-| `tug` | Move bookmark to parent commit |
-| `create` | Create bookmark at parent commit |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `stack-submit` | `ss` | Smart push - push stack to remote |
+| `bookmark-tug` | `tug` | Move bookmark to parent commit |
+| `bookmark-create` | `create` | Create bookmark at parent commit |
 
 ```bash
 # Push your stack
-jj ss
+jj stack-submit
 
 # Move a bookmark to the previous commit
-jj tug
+jj bookmark-tug
 
 # Create a new bookmark at the previous commit
-jj create my-feature
+jj bookmark-create my-feature
 ```
 
 ## Cleanup
 
-| Alias | Purpose |
-|-------|---------|
-| `gc` | Abandon empty commits in stack |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `stack-gc` | `gc` | Abandon empty commits in stack |
 
 ```bash
 # Clean up empty commits
-jj gc
+jj stack-gc
 ```
 
 ## Typical Workflow
 
 ```bash
 # Start fresh from trunk
-jj start
+jj stack-start
 
 # Make your changes, describe them
 jj describe -m "Add user authentication"
 
 # Create next commit
-jj n
+jj new
 
 # Make more changes
 jj describe -m "Add login form"
 
 # View your stack
-jj stack
+jj stack-view
 
 # Sync with trunk if needed
-jj sync
+jj stack-sync
 
 # Push for review
-jj ss
+jj stack-submit
 ```
 
 ## Working with Multiple Stacks
 
 ```bash
 # See all your stacks
-jj stacks
+jj stacks-all
 
 # Switch to a specific stack
 jj edit <commit-id>
 
 # View that stack
-jj stack
+jj stack-view
 ```

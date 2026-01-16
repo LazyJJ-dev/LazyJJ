@@ -89,8 +89,8 @@ After installing, verify everything works:
 # Check JJ can load the config
 jj config list | grep lazyjj
 
-# Try an alias
-jj st
+# Try a command
+jj status
 ```
 
 ## Troubleshooting

@@ -20,24 +20,24 @@ gh auth login
 
 ## PR Commands
 
-| Alias | Purpose |
-|-------|---------|
-| `prv` | View current PR |
-| `pro` | Open current PR in browser |
-| `prstack` | List bookmarks in stack |
-| `sprs` | Create/update stacked PRs |
-| `prs` | Generate PR stack summary |
-| `uprs` | Update PR comments with stack info |
-| `slackstack` | Slack-formatted PR stack |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `pr-view` | `prv` | View current PR |
+| `pr-open` | `pro` | Open current PR in browser |
+| `pr-stack` | `prstack` | List bookmarks in stack |
+| `pr-stack-create` | `sprs` | Create/update stacked PRs |
+| `pr-stack-summary` | `prs` | Generate PR stack summary |
+| `pr-stack-update` | `uprs` | Update PR comments with stack info |
+| `pr-stack-slack` | `slackstack` | Slack-formatted PR stack |
 
 ## Basic Workflow
 
 ```bash
 # View the PR for your current branch
-jj prv
+jj pr-view
 
 # Open it in the browser
-jj pro
+jj pr-open
 ```
 
 ## Stacked PRs
@@ -46,24 +46,24 @@ LazyJJ makes stacked PRs easy. First, create bookmarks for each commit:
 
 ```bash
 # Create your stack
-jj start
+jj stack-start
 jj describe -m "Add database schema"
-jj bookmark create db-schema
-jj n
+jj bookmark-create db-schema
+jj new
 
 jj describe -m "Add user model"
-jj bookmark create user-model
-jj n
+jj bookmark-create user-model
+jj new
 
 jj describe -m "Add user API"
-jj bookmark create user-api
+jj bookmark-create user-api
 ```
 
 Then create/update all PRs at once:
 
 ```bash
 # Create stacked PRs for all bookmarks
-jj sprs
+jj pr-stack-create
 ```
 
 This will:
@@ -77,7 +77,7 @@ Generate a summary of your PR stack:
 
 ```bash
 # Markdown format
-jj prs
+jj pr-stack-summary
 
 # Output:
 # ## PR Stack
@@ -90,7 +90,7 @@ jj prs
 Update PR descriptions with the stack summary:
 
 ```bash
-jj uprs
+jj pr-stack-update
 ```
 
 ## Slack Integration
@@ -98,7 +98,7 @@ jj uprs
 Share your PR stack status in Slack:
 
 ```bash
-jj slackstack
+jj pr-stack-slack
 
 # Output:
 # *PR Stack*
@@ -110,18 +110,18 @@ jj slackstack
 
 ## Utility Commands
 
-| Alias | Purpose |
-|-------|---------|
-| `repo` | Get GitHub repo from origin |
-| `gh` | Run any gh command in repo context |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `github-repo` | `repo` | Get GitHub repo from origin |
+| `github-cli` | `gh` | Run any gh command in repo context |
 
 ```bash
 # Get the repo name
-jj repo  # -> owner/repo
+jj github-repo  # -> owner/repo
 
 # Run any gh command
-jj gh pr list
-jj gh issue create
+jj github-cli pr list
+jj github-cli issue create
 ```
 
 ## Tips
@@ -141,10 +141,10 @@ When a PR in your stack is merged:
 
 ```bash
 # Sync with trunk (rebases your stack)
-jj sync
+jj stack-sync
 
 # Push updated stack
-jj ss
+jj stack-submit
 ```
 
 ### Manual PR Base

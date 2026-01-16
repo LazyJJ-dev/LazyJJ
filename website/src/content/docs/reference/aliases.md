@@ -3,55 +3,60 @@ title: Aliases
 description: Complete reference for LazyJJ aliases
 ---
 
-LazyJJ provides aliases to make common JJ commands faster to type.
+LazyJJ provides aliases that add value beyond built-in JJ commands. For shortcuts to native commands (`st`, `d`, `n`, `e`, `ll`), see `lazyjj-shortcuts.toml`.
 
-## Core Aliases
+## Value-Add Aliases
 
-These are the essential shortcuts everyone needs:
+These aliases add flags or combine commands beyond what JJ provides natively:
 
-| Alias | Command | Purpose |
-|-------|---------|---------|
-| `st` | `status` | Quick status check |
-| `d` | `diff` | View changes |
-| `l` | `log --limit 10` | Quick log (last 10 commits) |
-| `ll` | `log` | Full log |
-| `n` | `new` | Create new commit |
-| `e` | `edit` | Edit a commit |
+### Diff Aliases
 
-## Diff Aliases
+| Command | Shortcut | JJ Command | Purpose |
+|---------|----------|------------|---------|
+| `diff-summary` | `diffs` | `diff --summary --no-pager` | Compact diff summary |
+| `diff-files` | `diffls` | `diff --name-only --no-pager` | List changed files only |
 
-| Alias | Command | Purpose |
-|-------|---------|---------|
-| `diffs` | `diff --summary --no-pager` | Compact diff summary |
-| `diffls` | `diff --name-only --no-pager` | List changed files only |
+### Log Aliases
 
-## History Aliases
+| Command | Shortcut | JJ Command | Purpose |
+|---------|----------|------------|---------|
+| `log-short` | `l` | `log --limit 10` | Quick log (last 10 commits) |
+| `log-history` | `hist` | `log --no-pager` | Full history without pager |
 
-| Alias | Command | Purpose |
-|-------|---------|---------|
-| `hist` | `log --no-pager` | Full history without pager |
+### Git Aliases
 
-## Git Aliases
+| Command | Shortcut | JJ Command | Purpose |
+|---------|----------|------------|---------|
+| `git-fetch` | `gf` | `git fetch` | Fetch from remote |
 
-| Alias | Command | Purpose |
-|-------|---------|---------|
-| `gf` | `git fetch` | Fetch from remote |
+## Shortcuts
+
+LazyJJ also provides shortcuts to native JJ commands via `lazyjj-shortcuts.toml`:
+
+| Shortcut | JJ Command |
+|----------|------------|
+| `st` | `status` |
+| `d` | `diff` |
+| `ll` | `log` |
+| `n` | `new` |
+| `e` | `edit` |
 
 ## Examples
 
 ```bash
-# Quick workflow
-jj st        # Check what's changed
-jj d         # See the diff
-jj n         # Create new commit
-jj l         # See recent history
+# Quick workflow using shortcuts
+jj st            # Check what's changed
+jj d             # See the diff
+jj n             # Create new commit
+jj l             # See recent history (last 10)
 
-# Check changed files quickly
-jj diffls    # Just file names
-jj diffs     # Summary of changes
+# Using value-add aliases
+jj diff-files    # Just file names
+jj diff-summary  # Summary of changes
+jj log-history   # Full log without pager
 
 # Fetch latest
-jj gf        # Same as 'jj git fetch'
+jj git-fetch     # Same as 'jj git fetch'
 ```
 
 ## Customizing Aliases
@@ -61,9 +66,9 @@ To add your own aliases or override LazyJJ's, create a file in `~/.config/jj/con
 ```toml
 # ~/.config/jj/conf.d/zzz-my-aliases.toml
 [aliases]
-# Override an existing alias
-st = ["status", "--no-pager"]
+# Add custom aliases
+mylog = ["log", "--limit", "5", "-T", "builtin_log_compact"]
 
-# Add a new alias
-co = ["checkout"]
+# Override a shortcut
+st = ["status", "--no-pager"]
 ```

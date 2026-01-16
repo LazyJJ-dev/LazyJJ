@@ -6,9 +6,9 @@
 #
 # Stacked PRs Workflow:
 #   1. Create multiple commits in your stack, each with a bookmark
-#   2. jj sprs    - Create/update PRs for each bookmark
-#   3. jj prs     - Generate a summary of the stack
-#   4. jj uprs    - Update PR comments with the stack summary
+#   2. jj pr-stack-create    - Create/update PRs for each bookmark
+#   3. jj pr-stack-summary     - Generate a summary of the stack
+#   4. jj pr-stack-update    - Update PR comments with the stack summary
 
 [aliases]
 
@@ -16,52 +16,52 @@
 # REPOSITORY HELPERS
 # =============================================================================
 
-# repo - Get the GitHub repo name from origin remote
+# github-repo - Get the GitHub repo name from origin remote
 # What: Extracts owner/repo from the origin remote URL (e.g., "owner/repo").
 # When: Used internally by other GitHub commands to target the right repo.
-# Usage: jj repo
+# Usage: jj github-repo
 #        # Output: "lazyjj-dev/lazyjj"
-repo = ["util", "exec", "--", "sh", "-c", "jj git remote list | grep origin | awk '{print $2}' | sed 's/.*github.com[:\\/]//' | sed 's/.git$//'"]
+github-repo = ["util", "exec", "--", "sh", "-c", "jj git remote list | grep origin | awk '{print $2}' | sed 's/.*github.com[:\\/]//' | sed 's/.git$//'"]
 
-# gh - Run GitHub CLI command
+# github-cli - Run GitHub CLI command
 # What: Wrapper for `gh` CLI.
 # When: Use to run any gh command.
-# Usage: jj gh pr list
-#        jj gh issue view 123
-gh = ["util", "exec", "--", "gh"]
+# Usage: jj github-cli pr list
+#        jj github-cli issue view 123
+github-cli = ["util", "exec", "--", "gh"]
 
 # =============================================================================
 # PULL REQUEST VIEWING
 # =============================================================================
 
-# prv - View current PR details
+# pr-view - View current PR details
 # What: Shows details of the PR for the current bookmark.
 # When: Use to check PR status, reviews, and checks.
-# Usage: jj prv
-prv = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\""]
+# Usage: jj pr-view
+pr-view = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\""]
 
-# pro - Open current PR in browser
+# pr-open - Open current PR in browser
 # What: Opens the PR for current bookmark in your default browser.
 # When: Use to quickly jump to the PR on GitHub.
-# Usage: jj pro
-pro = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\" --web"]
+# Usage: jj pr-open
+pr-open = ["util", "exec", "--", "sh", "-c", "BRANCH=$(jj log -r 'ghbranch' --no-graph -T 'bookmarks' | head -1); gh pr view \"$BRANCH\" --web"]
 
 # =============================================================================
 # STACKED PRS
 # =============================================================================
 
-# prstack - List all bookmarks in the current stack
+# pr-stack - List all bookmarks in the current stack
 # What: Lists bookmark names in your stack.
 # When: Use to see which PRs are in your current stack.
-# Usage: jj prstack
-prstack = ["log", "-r", "trunk::stack & bookmarks()", "--no-graph", "-T", "bookmarks"]
+# Usage: jj pr-stack
+pr-stack = ["log", "-r", "trunk::stack & bookmarks()", "--no-graph", "-T", "bookmarks"]
 
-# sprs - Create or update stacked PRs
+# pr-stack-create - Create or update stacked PRs
 # What: For each bookmark in the stack, pushes and creates a PR if needed.
 #       Each PR's base is set to the previous bookmark (or main for the first).
 # When: Use after pushing your stack to create/update the PR chain.
-# Usage: jj sprs
-sprs = ["util", "exec", "--", "sh", "-c", """
+# Usage: jj pr-stack-create
+pr-stack-create = ["util", "exec", "--", "sh", "-c", """
 # Iterate through each bookmark in the stack
 for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$'); do
   echo "Processing $bookmark..."
@@ -77,15 +77,15 @@ for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmark
 done
 """]
 
-# prs - Generate PR stack summary
+# pr-stack-summary - Generate PR stack summary
 # What: Creates a text summary of all PRs in the stack with links.
 # When: Use to generate content for PR descriptions or Slack updates.
-# Usage: jj prs
+# Usage: jj pr-stack-summary
 #        # Output:
 #        # ## PR Stack
 #        # - [feature-a](https://github.com/.../1): First feature
 #        # - [feature-b](https://github.com/.../2): Second feature
-prs = ["util", "exec", "--", "sh", "-c", """
+pr-stack-summary = ["util", "exec", "--", "sh", "-c", """
 echo "## PR Stack"
 echo ""
 # List bookmarks in reverse order (oldest first)
@@ -96,13 +96,13 @@ for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmark
 done
 """]
 
-# uprs - Update all PR comments with stack summary
+# pr-stack-update - Update all PR comments with stack summary
 # What: Adds/updates a comment on each PR in the stack showing the full stack.
 # When: Use to keep PR comments updated with the current stack status.
-# Usage: jj uprs
-uprs = ["util", "exec", "--", "sh", "-c", """
+# Usage: jj pr-stack-update
+pr-stack-update = ["util", "exec", "--", "sh", "-c", """
 # Generate the stack summary
-STACK_INFO=$(jj prs)
+STACK_INFO=$(jj pr-stack-summary)
 # Update each PR's comment with the summary
 for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$'); do
   PR_NUM=$(gh pr view "$bookmark" --json number -q '.number' 2>/dev/null)
@@ -112,17 +112,17 @@ for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmark
 done
 """]
 
-# slackstack - Generate Slack-formatted PR stack status
+# pr-stack-slack - Generate Slack-formatted PR stack status
 # What: Creates a Slack message with emoji status indicators for each PR.
 # When: Use to share stack status in Slack channels.
-# Usage: jj slackstack | pbcopy
+# Usage: jj pr-stack-slack | pbcopy
 #
 # Emoji meanings:
 #   :white_check_mark:      - Merged
 #   :large_yellow_circle:   - Open
 #   :x:                     - Closed
 #   :grey_question:         - Unknown
-slackstack = ["util", "exec", "--", "sh", "-c", """
+pr-stack-slack = ["util", "exec", "--", "sh", "-c", """
 echo "*PR Stack*"
 echo ""
 for bookmark in $(jj log -r 'trunk::stack & bookmarks()' --no-graph -T 'bookmarks ++ \"\\n\"' | grep -v '^$' | tac); do

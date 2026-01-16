@@ -18,13 +18,13 @@ Optional but recommended:
 
 ## Commands
 
-| Alias | Purpose |
-|-------|---------|
-| `clstart` | Create JJ workspace + tmux session |
-| `clstop` | Stop and clean up workspace |
-| `clresolve` | Resolve conflicts using Claude |
-| `clreview` | Review a PR using Claude |
-| `claude-checkpoint` | Save checkpoint with message |
+| Command | Shortcut | Purpose |
+|---------|----------|---------|
+| `claude-start` | `clstart` | Create JJ workspace + tmux session |
+| `claude-stop` | `clstop` | Stop and clean up workspace |
+| `claude-resolve` | `clresolve` | Resolve conflicts using Claude |
+| `claude-review` | `clreview` | Review a PR using Claude |
+| `claude-checkpoint` | - | Save checkpoint with message |
 
 ## Workspace Management
 
@@ -32,7 +32,7 @@ Claude workspaces let you have Claude work on your code in an isolated JJ worksp
 
 ```bash
 # Start a Claude workspace
-jj clstart my-feature
+jj claude-start my-feature
 
 # Output:
 # Started tmux session: my-feature
@@ -47,7 +47,7 @@ When done:
 
 ```bash
 # Stop and clean up
-jj clstop my-feature
+jj claude-stop my-feature
 ```
 
 ## Conflict Resolution
@@ -56,7 +56,7 @@ When you have merge conflicts, Claude can help:
 
 ```bash
 # After a rebase with conflicts
-jj clresolve
+jj claude-resolve
 ```
 
 This runs Claude on each conflicted file to help resolve it.
@@ -67,10 +67,10 @@ Have Claude review a pull request:
 
 ```bash
 # Review current PR
-jj clreview
+jj claude-review
 
 # Review specific PR
-jj clreview 123
+jj claude-review 123
 ```
 
 ## Checkpointing
@@ -90,10 +90,10 @@ A typical AI-assisted development session:
 
 ```bash
 # Start fresh from trunk
-jj start
+jj stack-start
 
 # Start a Claude workspace for your feature
-jj clstart auth-feature
+jj claude-start auth-feature
 
 # Attach to Claude session
 tmux attach -t auth-feature
@@ -104,14 +104,14 @@ tmux attach -t auth-feature
 jj claude-checkpoint "basic auth flow done"
 
 # When done, stop the workspace
-jj clstop auth-feature
+jj claude-stop auth-feature
 
 # Review and clean up your commits
-jj stack
+jj stack-view
 jj squash  # if needed
 
 # Create PR
-jj sprs
+jj pr-stack-create
 ```
 
 ## Tips
@@ -121,8 +121,8 @@ jj sprs
 You can have multiple Claude workspaces:
 
 ```bash
-jj clstart feature-a
-jj clstart feature-b
+jj claude-start feature-a
+jj claude-start feature-b
 
 # List workspaces
 jj workspace list
@@ -133,10 +133,10 @@ tmux attach -t feature-a
 
 ### Without tmux
 
-If you don't have tmux, `clstart` still creates the workspace:
+If you don't have tmux, `claude-start` still creates the workspace:
 
 ```bash
-jj clstart my-feature
+jj claude-start my-feature
 # Workspace created at: .jj-workspaces/my-feature
 # tmux not available - start Claude manually in that directory
 
