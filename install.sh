@@ -100,7 +100,8 @@ install() {
     info "  - Claude integration (clstart, clstop)"
     info ""
     info "Get started: jj st"
-    info "Learn more: https://lazyjj.dev"
+    info "Quick reference: jj lazyjj"
+    info "Full docs: https://lazyjj.dev"
 }
 
 # Parse arguments

@@ -5,7 +5,7 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://lazyjj-dev.github.io',
-  base: '/lazyjj',
+  base: '/LazyJJ',
   integrations: [
     starlight({
       title: 'LazyJJ',

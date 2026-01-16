@@ -1,0 +1,81 @@
+# LazyJJ Self-Management
+# https://lazyjj.dev
+#
+# Commands for managing LazyJJ itself.
+
+[aliases]
+
+# lazyjj - Show cheat sheet and link to docs
+# What: Displays a quick reference of available LazyJJ commands.
+# When: Use to quickly recall available aliases without checking docs.
+# Usage: jj lazyjj
+lazyjj = ["util", "exec", "--", "sh", "-c", """
+cat << 'EOF'
+LazyJJ - Supercharged JJ Configuration
+https://lazyjj.dev
+
+CORE ALIASES
+  st          status
+  d           diff
+  l           log (last 10)
+  ll          log (full)
+  n           new commit
+  e           edit commit
+  gf          git fetch
+
+STACK WORKFLOW
+  stack       view current stack
+  stacks      view all your stacks
+  top         go to top of stack
+  bottom      go to bottom of stack
+  sync        fetch + rebase onto trunk
+  start       fetch + new commit from trunk
+  ss          push stack to remote
+
+GITHUB
+  prv         view current PR
+  pro         open PR in browser
+  sprs        create/update stacked PRs
+
+CLAUDE
+  clstart     start Claude workspace
+  clstop      stop Claude workspace
+
+MANAGEMENT
+  lazyjj-update    update LazyJJ to latest
+
+Full docs: https://lazyjj.dev
+EOF
+"""]
+
+# lazyjj-update - Update LazyJJ to latest version
+# What: Pulls the latest LazyJJ from git/jj and re-runs install.
+# When: Use to get the latest aliases and features.
+# Usage: jj lazyjj-update
+lazyjj-update = ["util", "exec", "--", "sh", "-c", """
+LAZYJJ_DIR="${HOME}/.config/jj/lazyjj"
+
+if [ ! -d "$LAZYJJ_DIR" ]; then
+  echo "LazyJJ not found at $LAZYJJ_DIR"
+  exit 1
+fi
+
+echo "Updating LazyJJ..."
+cd "$LAZYJJ_DIR"
+
+if [ -d ".git" ]; then
+  git pull --ff-only
+elif [ -d ".jj" ]; then
+  jj git fetch
+  jj new trunk
+else
+  echo "LazyJJ directory is not a git/jj repo. Re-run install:"
+  echo "  curl -fsSL https://lazyjj.dev/install.sh | bash"
+  exit 1
+fi
+
+# Re-run install to update symlinks if needed
+./install.sh
+
+echo "LazyJJ updated successfully!"
+"""]
