@@ -1,6 +1,39 @@
-# LazyJJ
+<p align="center">
+  <img src="website/src/assets/logo-light.svg" alt="LazyJJ Logo" width="200"/>
+</p>
 
-A ready-to-use [Jujutsu (JJ)](https://jj-vcs.github.io/jj/) distribution with sensible defaults, powerful aliases, and modern workflows.
+<h1 align="center">LazyJJ</h1>
+
+<p align="center">
+  <strong>Ready-to-use Jujutsu configuration for stacked PR workflows</strong>
+</p>
+
+<p align="center">
+  Stack commands • Claude Code integration • GitHub helpers • Sensible defaults
+</p>
+
+---
+
+## What is LazyJJ?
+
+LazyJJ is a pre-configured [Jujutsu (JJ)](https://jj-vcs.github.io/jj/) distribution that gives you a complete stacked workflow out of the box.
+
+Vanilla JJ is powerful but requires configuration. LazyJJ provides:
+
+- **Stack workflow commands** - Navigate and manage stacks of commits for stacked PRs
+- **Claude Code integration** - Streamlined worktree management for AI pair programming
+- **GitHub helpers** - Create and manage stacked PRs with `gh` CLI
+- **Sensible defaults** - Colors, aliases, and UI tweaks pre-configured
+
+All built on JJ's native capabilities: no staging area, operation log with undo, first-class conflicts, and automatic rebasing.
+
+## Why JJ?
+
+Jujutsu is a modern version control system that makes stacking natural:
+
+- **Native stacking** - Built into the VCS, not bolted on
+- **First-class conflicts** - Don't block your workflow
+- **Automatic rebasing** - Edit any commit, descendants rebase automatically
 
 ## Installation
 
@@ -15,53 +48,102 @@ git clone https://github.com/lazyjj-dev/lazyjj.git ~/.config/jj/lazyjj
 cd ~/.config/jj/lazyjj && ./install.sh
 ```
 
-## What's Included
+## Quick Start
 
-### Core Aliases
+After installation:
 
-| Alias | Command | Purpose |
-|-------|---------|---------|
-| `st` | `status` | Quick status |
-| `d` | `diff` | View changes |
-| `l` | `log --limit 10` | Quick log |
-| `ll` | `log` | Full log |
-| `n` | `new` | New commit |
-| `e` | `edit` | Edit commit |
+```bash
+# Initialize JJ in your Git repo
+jj git init --colocate
 
-### Stack Workflow
+# Start a new feature from trunk
+jj stack-start
 
-| Alias | Purpose |
-|-------|---------|
-| `stack` | View current stack with trunk |
-| `stacks` | View all your stacks |
-| `top` | Jump to top of stack |
-| `bottom` | Jump to bottom of stack |
-| `sync` | Fetch and restack onto trunk |
-| `start` | Fetch and start fresh from trunk |
+# Make changes (automatically in the commit!)
+vim src/feature.js
 
-### GitHub Integration
+# Describe your work
+jj describe -m "Add feature"
 
-| Alias | Purpose |
-|-------|---------|
-| `prv` | View current PR |
-| `pro` | Open current PR in browser |
-| `sprs` | Create/update stacked PRs |
-| `prs` | Generate PR stack summary |
+# Create next commit
+jj new
 
-### Claude Integration
+# View your stack
+jj stack-view
 
-| Alias | Purpose |
-|-------|---------|
-| `clstart` | Create JJ workspace + tmux session for Claude |
-| `clstop` | Stop and clean up Claude workspace |
-| `clresolve` | Resolve conflicts using Claude |
-| `clreview` | Review a PR using Claude |
+# Create stacked PRs
+jj pr-stack-create
+```
+
+See the [Quick Start guide](https://lazyjj.dev/quickstart/) for more.
+
+## What You Get
+
+### 📚 Stack Workflow Commands
+
+Navigate and manage stacks of commits for stacked PRs:
+
+| Command        | Shortcut | Purpose                       |
+| -------------- | -------- | ----------------------------- |
+| `stack-view`   | `stack`  | View current stack with trunk |
+| `stacks-all`   | `stacks` | View all your stacks          |
+| `stack-top`    | `top`    | Jump to top of stack          |
+| `stack-bottom` | `bottom` | Jump to bottom of stack       |
+| `stack-sync`   | `sync`   | Fetch and rebase onto trunk   |
+| `stack-start`  | `start`  | Fresh start from trunk        |
+
+### 🤖 Claude Code Integration
+
+Streamlined worktree management for AI pair programming:
+
+| Command             | Shortcut    | Purpose                            |
+| ------------------- | ----------- | ---------------------------------- |
+| `claude-start`      | `clstart`   | Create JJ workspace + tmux session |
+| `claude-stop`       | `clstop`    | Stop and clean up workspace        |
+| `claude-resolve`    | `clresolve` | AI-assisted conflict resolution    |
+| `claude-review`     | `clreview`  | AI-assisted PR review              |
+| `claude-checkpoint` | -           | Save progress checkpoint           |
+
+### 🔗 GitHub Integration
+
+Create and manage stacked PRs (requires `gh` CLI):
+
+| Command            | Shortcut | Purpose                   |
+| ------------------ | -------- | ------------------------- |
+| `pr-view`          | `prv`    | View current PR           |
+| `pr-open`          | `pro`    | Open PR in browser        |
+| `pr-stack-create`  | `sprs`   | Create/update stacked PRs |
+| `pr-stack-summary` | `prs`    | Generate PR stack summary |
+
+### ⚡ Core Aliases
+
+Essential shortcuts and value-add commands:
+
+| Alias   | Command                     | Purpose              |
+| ------- | --------------------------- | -------------------- |
+| `st`    | `status`                    | Quick status         |
+| `d`     | `diff`                      | View changes         |
+| `l`     | `log --limit 10`            | Quick log            |
+| `n`     | `new`                       | New commit           |
+| `e`     | `edit`                      | Edit commit          |
+| `diffs` | `diff --summary --no-pager` | Compact diff summary |
+| `gf`    | `git fetch`                 | Fetch from remote    |
 
 ## Configuration
 
-LazyJJ installs to `~/.config/jj/lazyjj/` and symlinks config files to `~/.config/jj/conf.d/`. JJ loads all `.toml` files from `conf.d/` in lexicographic order.
+LazyJJ installs to `~/.config/jj/lazyjj/` and symlinks config files to `~/.config/jj/conf.d/`.
+
+JJ loads all `.toml` files from `conf.d/` in lexicographic order, so your personal overrides in `~/.config/jj/conf.d/zzz-*.toml` will take precedence.
 
 Your personal config (name, email) stays in `~/.config/jj/config.toml`.
+
+## Learn More
+
+- 📖 [Full Documentation](https://lazyjj.dev/)
+- 🚀 [Quick Start Guide](https://lazyjj.dev/quickstart/)
+- 📚 [Stack Workflow](https://lazyjj.dev/reference/stack/)
+- 🔗 [GitHub Integration](https://lazyjj.dev/integrations/github/)
+- 🤖 [Claude Integration](https://lazyjj.dev/integrations/claude/)
 
 ## Uninstall
 
