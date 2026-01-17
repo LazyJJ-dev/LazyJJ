@@ -7,6 +7,7 @@
 #   ./install.sh --uninstall
 
 set -e
+set -o pipefail
 
 LAZYJJ_VERSION="${LAZYJJ_VERSION:-latest}"
 LAZYJJ_DIR="${HOME}/.config/jj/lazyjj"
@@ -88,27 +89,61 @@ install() {
 	mkdir -p "$LAZYJJ_DIR"
 	mkdir -p "$CONF_D"
 
-	# Download or copy config files
+	# Clone repository or use local directory
 	if [ -d "$(dirname "$0")/config" ]; then
-		# Local install (development)
+		# Local install (development) - we're running from within the repo
 		info "Installing from local directory..."
-		cp -r "$(dirname "$0")/config" "$LAZYJJ_DIR/"
-	else
-		# Download from GitHub releases
-		info "Downloading LazyJJ $LAZYJJ_VERSION..."
-
-		if [ "$LAZYJJ_VERSION" = "latest" ]; then
-			DOWNLOAD_URL="https://github.com/lazyjj-dev/lazyjj/releases/latest/download/lazyjj-config.tar.gz"
-		else
-			DOWNLOAD_URL="https://github.com/lazyjj-dev/lazyjj/releases/download/${LAZYJJ_VERSION}/lazyjj-config.tar.gz"
+		# Don't copy, just use the existing repo location
+		# This path means install.sh is in the repo root or a subdirectory
+		SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+		REPO_ROOT="$SCRIPT_DIR"
+		# If we're in website/public, go up two levels
+		if [ -d "$SCRIPT_DIR/../../config" ]; then
+			REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 		fi
 
-		if command -v curl &>/dev/null; then
-			curl -fsSL "$DOWNLOAD_URL" | tar xz -C "$LAZYJJ_DIR"
-		elif command -v wget &>/dev/null; then
-			wget -qO- "$DOWNLOAD_URL" | tar xz -C "$LAZYJJ_DIR"
-		else
-			error "Neither curl nor wget found. Please install one of them."
+		# If LazyJJ_DIR already exists and is not the repo, remove it
+		if [ -d "$LAZYJJ_DIR" ] && [ "$LAZYJJ_DIR" != "$REPO_ROOT" ]; then
+			rm -rf "$LAZYJJ_DIR"
+		fi
+
+		# Create symlink to the repo or copy it
+		if [ "$LAZYJJ_DIR" != "$REPO_ROOT" ]; then
+			cp -r "$REPO_ROOT" "$LAZYJJ_DIR"
+		fi
+	else
+		# Clone from GitHub
+		info "Cloning LazyJJ repository..."
+
+		REPO_URL="https://github.com/lazyjj-dev/lazyjj.git"
+
+		# Remove existing directory if it exists and is not a git/jj repo
+		if [ -d "$LAZYJJ_DIR" ]; then
+			if [ ! -d "$LAZYJJ_DIR/.jj" ] && [ ! -d "$LAZYJJ_DIR/.git" ]; then
+				warn "Removing existing non-repo directory at $LAZYJJ_DIR"
+				rm -rf "$LAZYJJ_DIR"
+			else
+				info "LazyJJ directory already exists as a repository"
+				cd "$LAZYJJ_DIR"
+				if [ -d ".jj" ]; then
+					jj git fetch || error "Failed to update repository"
+					jj new trunk || true
+				elif [ -d ".git" ]; then
+					git pull --ff-only || error "Failed to update repository"
+				fi
+			fi
+		fi
+
+		# Clone if directory doesn't exist
+		if [ ! -d "$LAZYJJ_DIR" ]; then
+			# Use jj git clone if jj is available (preferred), otherwise fall back to git
+			if command -v jj &>/dev/null; then
+				jj git clone --no-colocate "$REPO_URL" "$LAZYJJ_DIR" || error "Failed to clone repository from $REPO_URL"
+			elif command -v git &>/dev/null; then
+				git clone "$REPO_URL" "$LAZYJJ_DIR" || error "Failed to clone repository from $REPO_URL"
+			else
+				error "Neither jj nor git is installed. Please install jj first."
+			fi
 		fi
 	fi
 
