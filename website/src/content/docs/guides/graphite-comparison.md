@@ -75,7 +75,7 @@ JJ doesn't require branch names. You can work freely and only create bookmarks w
 jj new                              # Just start working
 jj describe -m "Add feature"
 # ... later, when ready to push ...
-jj bookmark-create feature-name
+jj create feature-name
 ```
 
 Graphite requires a branch for every commit in your stack.

@@ -88,12 +88,11 @@ This isn't just a nicer CLI—it's a fundamentally better architecture.
 | Graphite | LazyJJ | Notes |
 |----------|--------|-------|
 | `gt checkout` / `gt co` | `jj edit` | Switch to commit |
-| `gt up` / `gt u` | (see below) | Move up one |
-| `gt down` / `gt d` | (see below) | Move down one |
+| `gt up` / `gt u` | `jj edit <change-id>` | Move up one |
+| `gt down` / `gt d` | `jj edit <change-id>` | Move down one |
 | `gt top` / `gt t` | `jj stack-top` | Go to top of stack |
-| `gt bottom` / `gt b` | `jj stack-bottom` | Go to bottom of stack |
 
-**Note**: JJ doesn't have direct "up/down one commit" commands because its commit model is different. Use `jj edit <change-id>` to jump to any commit, or `jj stack-top` / `jj stack-bottom` to go to the ends.
+**Note**: JJ doesn't have direct "up/down one commit" commands because its commit model is different. Use `jj edit <change-id>` to jump to any commit, or `jj stack-top` to go to the top of the stack.
 
 ### Reorganizing
 

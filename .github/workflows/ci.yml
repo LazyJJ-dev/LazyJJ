@@ -37,6 +37,9 @@ jobs:
         working-directory: website
         run: npm ci
 
+      - name: Validate documentation commands
+        run: ./website/scripts/validate-doc-commands.sh
+
       - name: Build website
         working-directory: website
         run: npm run build

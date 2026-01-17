@@ -62,7 +62,7 @@ Assuming that bookmarks (JJ's branches) move forward when you create new commits
 
 ```bash
 # Create a bookmark
-jj bookmark-create my-feature
+jj create my-feature
 
 # Create a new commit
 jj new -m "More work"
@@ -84,14 +84,14 @@ Move bookmarks manually when needed:
 
 ```bash
 # Create a bookmark at parent commit (common pattern)
-jj bookmark-create my-feature
+jj create my-feature
 # This creates bookmark at @- (parent of current position)
 
 # Or move an existing bookmark
 jj bookmark set my-feature -r @
 
-# Or use LazyJJ's bookmark-tug alias
-jj bookmark-tug my-feature  # Moves bookmark to parent
+# Or use LazyJJ's tug alias
+jj tug  # Moves the current bookmark to parent
 ```
 
 ### Why JJ Works This Way

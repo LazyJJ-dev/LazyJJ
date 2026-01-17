@@ -32,10 +32,10 @@ If you want more control, do it manually:
 
 ```bash
 # Fetch latest from remote
-jj git-fetch
+jj git fetch
 
 # Rebase your stack onto trunk
-jj stack-rebase
+jj restack
 ```
 
 ## Handling Conflicts
@@ -117,7 +117,7 @@ Before syncing, see how far behind you are:
 jj stack-view
 
 # Fetch without rebasing to see what's new
-jj git-fetch
+jj git fetch
 jj log -r "trunk..@"    # See your commits relative to trunk
 ```
 

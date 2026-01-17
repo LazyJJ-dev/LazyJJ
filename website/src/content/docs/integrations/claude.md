@@ -23,7 +23,6 @@ Optional but recommended:
 | `claude-start` | `clstart` | Create JJ workspace + tmux session |
 | `claude-stop` | `clstop` | Stop and clean up workspace |
 | `claude-resolve` | `clresolve` | Resolve conflicts using Claude |
-| `claude-review` | `clreview` | Review a PR using Claude |
 | `claude-checkpoint` | - | Save checkpoint with message |
 
 ## Workspace Management
@@ -60,18 +59,6 @@ jj claude-resolve
 ```
 
 This runs Claude on each conflicted file to help resolve it.
-
-## PR Review
-
-Have Claude review a pull request:
-
-```bash
-# Review current PR
-jj claude-review
-
-# Review specific PR
-jj claude-review 123
-```
 
 ## Checkpointing
 

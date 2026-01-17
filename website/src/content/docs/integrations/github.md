@@ -24,11 +24,11 @@ gh auth login
 |---------|----------|---------|
 | `pr-view` | `prv` | View current PR |
 | `pr-open` | `pro` | Open current PR in browser |
-| `pr-stack` | `prstack` | List bookmarks in stack |
+| `pr-stack` | - | List bookmarks in stack |
 | `pr-stack-create` | `sprs` | Create/update stacked PRs |
 | `pr-stack-summary` | `prs` | Generate PR stack summary |
 | `pr-stack-update` | `uprs` | Update PR comments with stack info |
-| `pr-stack-slack` | `slackstack` | Slack-formatted PR stack |
+| `pr-stack-md` | `prmd` | Formatted PR stack with CI/review status |
 
 ## Basic Workflow
 
@@ -48,15 +48,15 @@ LazyJJ makes stacked PRs easy. First, create bookmarks for each commit:
 # Create your stack
 jj stack-start
 jj describe -m "Add database schema"
-jj bookmark-create db-schema
+jj create db-schema
 jj new
 
 jj describe -m "Add user model"
-jj bookmark-create user-model
+jj create user-model
 jj new
 
 jj describe -m "Add user API"
-jj bookmark-create user-api
+jj create user-api
 ```
 
 Then create/update all PRs at once:
@@ -93,21 +93,6 @@ Update PR descriptions with the stack summary:
 jj pr-stack-update
 ```
 
-## Slack Integration
-
-Share your PR stack status in Slack:
-
-```bash
-jj pr-stack-slack
-
-# Output:
-# *PR Stack*
-#
-# :white_check_mark: <url|user-api>: Add user API
-# :large_yellow_circle: <url|user-model>: Add user model
-# :white_check_mark: <url|db-schema>: Add database schema
-```
-
 ## Understanding Bookmarks and Branches
 
 One of the most common sources of confusion:
@@ -121,8 +106,8 @@ One of the most common sources of confusion:
 Unlike Git branches, JJ bookmarks stay where you set them:
 
 ```bash
-jj bookmark-create my-feature  # Bookmark at current commit
-jj new -m "More work"          # Create new commit
+jj create my-feature  # Bookmark at parent commit (@-)
+jj new -m "More work" # Create new commit
 jj log
 # my-feature is still at the old commit!
 
@@ -146,15 +131,15 @@ jj log -r ghbranch
 | Command | Shortcut | Purpose |
 |---------|----------|---------|
 | `github-repo` | `repo` | Get GitHub repo from origin |
-| `github-cli` | `gh` | Run any gh command in repo context |
+| `gh` | - | Run any gh command in repo context |
 
 ```bash
 # Get the repo name
 jj github-repo  # -> owner/repo
 
 # Run any gh command
-jj github-cli pr list
-jj github-cli issue create
+jj gh pr list
+jj gh issue create
 ```
 
 ## Tips
