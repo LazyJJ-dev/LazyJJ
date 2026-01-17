@@ -9,8 +9,9 @@
 #
 # Workspace Model:
 #   - Main repo: ~/project
-#   - Claude workspaces: ~/project/.jj-workspaces/<name>
+#   - Claude workspaces: ~/project-workspaces/<name>
 #   - Each workspace is a JJ workspace with its own tmux session
+#   - Workspaces are created as sibling directories to keep them outside the repo
 
 [aliases]
 
@@ -20,34 +21,58 @@
 
 # claude-start - Start a Claude workspace with tmux session
 # What: Creates a JJ workspace for isolated AI-assisted work in a tmux session.
-#       Workspaces are created in .jj-workspaces/<name> directory.
+#       Workspaces are created in <repo>-workspaces/<name> sibling directory.
 # When: Use to start a new task with Claude without affecting your main workspace.
 # Usage: jj claude-start feature-x
 #        jj claude-start bug-fix-123
 #
 # How it works:
-#   1. Creates workspace directory at .jj-workspaces/<name>
-#   2. Runs `jj workspace add` to create a JJ workspace
-#   3. Creates a tmux session and starts Claude in it
-#   4. Provides attach instructions
-claude-start = ["util", "exec", "--", "sh", "-c", """
-WORKSPACE_NAME="${1:-claude-$(date +%s)}"
-WORKSPACE_DIR=".jj-workspaces/$WORKSPACE_NAME"
+#   1. Sanitizes workspace name to prevent shell injection
+#   2. Calculates source repo root and creates -workspaces sibling directory
+#   3. Creates workspace directory at <repo>-workspaces/<name>
+#   4. Runs `jj workspace add` to create a JJ workspace
+#   5. Creates a tmux session (or reuses existing one)
+#   6. Runs .jj-workspace-setup.sh if it exists
+#   7. Attaches to session (or switches if already in tmux)
+claude-start = ["util", "exec", "--", "bash", "-c", """
+  set -euo pipefail
+  # Require exactly one argument
+  if [ "$#" -ne 1 ]; then
+    echo "Error: You must name the workspace."
+    exit 1
+  fi
+  workspace="${1//[^a-zA-Z0-9]/-}"
+  source="$(jj workspace root | sed -e 's/-workspaces\\/.*//')"
+  mkdir -p "$source-workspaces"
+  target="$source-workspaces/$workspace"
+  # If workspace doesn't exist, create it
+  if [ ! -d "$target" ]; then
+    echo "Creating workspace '$target'"
+    jj workspace add "$target"
+  fi
 
-# Create JJ workspace
-jj workspace add "$WORKSPACE_DIR" 2>/dev/null || { echo "Failed to create workspace"; exit 1; }
+  session=$(basename $target)
+  # If tmux session doesn't exist, create it
+  if ! tmux has-session -t "$session" 2>/dev/null; then
+    # Create a new detached session
+    echo "Creating tmux session '$session'"
+    tmux new-session -c "$target" -d -s "$session"
+    echo "Session '$session' created."
+    # If .jj-workspace-setup.sh exists in $source, run it
+    if [ -f "$source/.jj-workspace-setup.sh" ]; then
+      echo "Configuring session."
+      $source/.jj-workspace-setup.sh "$target"
+    fi
+  else
+    echo "Session '$session' already exists."
+  fi
 
-# Start tmux session with Claude
-if command -v tmux >/dev/null 2>&1; then
-  tmux new-session -d -s "$WORKSPACE_NAME" -c "$WORKSPACE_DIR"
-  tmux send-keys -t "$WORKSPACE_NAME" "claude" Enter
-  echo "Started tmux session: $WORKSPACE_NAME"
-  echo "Attach with: tmux attach -t $WORKSPACE_NAME"
-else
-  echo "Workspace created at: $WORKSPACE_DIR"
-  echo "tmux not available - start Claude manually in that directory"
-fi
-"""]
+  if [ -z "$TMUX" ]; then
+    tmux attach -t "=$session"
+  else
+    tmux switch-client -t "=$session"
+  fi
+""", ""]
 
 # claude-stop - Stop and clean up a Claude workspace
 # What: Removes a JJ workspace, deletes its directory, and kills the tmux session.
@@ -55,69 +80,89 @@ fi
 # Usage: jj claude-stop feature-x
 #
 # How it works:
-#   1. Kills the tmux session
-#   2. Runs `jj workspace forget` to remove from JJ
-#   3. Deletes the workspace directory
-claude-stop = ["util", "exec", "--", "sh", "-c", """
-WORKSPACE_NAME="${1:-$(tmux display-message -p '#S' 2>/dev/null)}"
-if [ -z "$WORKSPACE_NAME" ]; then
-  echo "Usage: jj claude-stop <workspace-name>"
-  exit 1
-fi
+#   1. Validates workspace name argument
+#   2. Calculates source repo root and workspace path
+#   3. Runs `jj workspace forget` to remove from JJ
+#   4. Deletes the workspace directory
+#   5. Kills the tmux session if it exists
+claude-stop = ["util", "exec", "--", "bash", "-c", """
+  set -euo pipefail
+  # Require exactly one argument
+  if [ "$#" -ne 1 ]; then
+    echo "Error: You must name the workspace."
+    exit 1
+  fi
+  workspace="${1//[^a-zA-Z0-9]/-}"
+  source="$(jj workspace root | sed -e 's/-workspaces\\/.*//')"
+  target="$workspace"
+  name=$(basename "$target")
 
-WORKSPACE_DIR=".jj-workspaces/$WORKSPACE_NAME"
-
-# Kill tmux session if it exists
-tmux kill-session -t "$WORKSPACE_NAME" 2>/dev/null
-
-# Forget the JJ workspace
-jj workspace forget "$WORKSPACE_NAME" 2>/dev/null
-
-# Clean up directory
-rm -rf "$WORKSPACE_DIR" 2>/dev/null
-
-echo "Stopped and cleaned up workspace: $WORKSPACE_NAME"
-"""]
+  jj workspace forget "$name" || true
+  rm -rf "$source-workspaces/$target"
+  if tmux has-session -t "$name" 2>/dev/null; then
+    tmux kill-session -t "$name"
+    echo "Session '$name' stopped."
+  else
+    echo "Session '$name' does not exist."
+  fi
+""", ""]
 
 # =============================================================================
 # AI-ASSISTED OPERATIONS
 # =============================================================================
 
 # claude-resolve - Resolve conflicts using Claude
-# What: Lists conflicted files and launches Claude to help resolve them.
+# What: Creates a new commit and launches Claude to help resolve conflicts.
 # When: Use after a rebase or merge that resulted in conflicts.
-# Usage: jj claude-resolve
+# Usage: jj claude-resolve          # resolve conflicts in parent (@-)
+#        jj claude-resolve <rev>    # resolve conflicts in specific revision
 #
 # How it works:
-#   1. Lists conflicted files using `jj resolve --list`
-#   2. For each file, launches Claude with conflict resolution prompt
-claude-resolve = ["util", "exec", "--", "sh", "-c", """
-CONFLICTS=$(jj resolve --list 2>/dev/null | awk '{print $1}')
-if [ -z "$CONFLICTS" ]; then
-  echo "No conflicts to resolve"
-  exit 0
-fi
-
-echo "Conflicts found:"
-echo "$CONFLICTS"
-echo ""
-echo "Starting Claude to help resolve..."
-
-for file in $CONFLICTS; do
-  echo "Resolving: $file"
-  claude --prompt "Help me resolve the merge conflict in this file. Show me the resolved version." "$file"
-done
-"""]
+#   1. Takes optional revision argument (defaults to @-)
+#   2. Creates new commit based on that revision
+#   3. Lists all conflicted files in parent revision
+#   4. Launches Claude in plan mode with all conflicts at once
+#   5. Provides helpful JJ commands for investigating conflict history
+claude-resolve = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  """
+  set -euo pipefail
+  revision=${1:-@-}
+  if [ "$#" -eq 1 ]; then
+    jj new $revision
+  fi
+  echo "Resolving conflicts in $revision"
+  claude --permission-mode=plan "resolve conflicts in $(jj resolve -r @- --list | awk '{print \"@\"$1}' | paste -sd' ' -). You can look for recent changes to the conflicted files with 'jj log -r \\\"latest(..@ & files({file}))\\\" -s' and check the actual changes with 'jj show {change_id}'"
+""",
+  "",]
 
 # claude-checkpoint - Create a checkpoint commit for Claude's work
-# What: Describes current commit and creates a new one.
+# What: Checks for changes, creates new commit, and describes previous commit.
 #       Used to save Claude's progress at logical stopping points.
 # When: Use during Claude sessions to checkpoint progress.
-# Usage: jj claude-checkpoint
-#        jj claude-checkpoint "implemented feature X"
-claude-checkpoint = ["util", "exec", "--", "sh", "-c", """
-MSG="${1:-checkpoint}"
-jj describe -m "checkpoint: $MSG"
-jj new
-echo "Checkpointed: $MSG"
-"""]
+# Usage: jj claude-checkpoint                    # create checkpoint with no description
+#        jj claude-checkpoint "implemented X"    # create checkpoint with description
+#
+# How it works:
+#   1. Checks if current commit is empty (no changes)
+#   2. If empty, exits without creating checkpoint
+#   3. If not empty, creates new commit first
+#   4. Describes previous commit with provided message (if any)
+claude-checkpoint = ["util", "exec", "--", "bash", "-c", """
+  set -euo pipefail
+  is_empty=$(jj show @ -T 'self.empty()' --no-pager)
+  if [ "$is_empty" = "true" ]; then
+    echo "No changes to checkpoint."
+    exit 0
+  fi
+  jj new
+  author="$1"
+  # if author is set, describe the previous commit with the author
+  if [ -n "$author" ]; then
+    jj describe -r @- -m "$author"
+  fi
+""", ""]
