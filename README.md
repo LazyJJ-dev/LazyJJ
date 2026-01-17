@@ -173,10 +173,10 @@ Create and manage stacked PRs (requires `gh` CLI):
 
 **PR formatting:**
 
-| Command            | Shortcut | Purpose                           |
-| ------------------ | -------- | --------------------------------- |
-| `pr-stack-md`      | `prmd`   | Format current stack (deprecated) |
-| `pr-stacks-all-md` | -        | Format all mutable PRs            |
+| Command            | Shortcut | Purpose                |
+| ------------------ | -------- | ---------------------- |
+| `pr-stack-md`      | `prmd`   | Format current stack   |
+| `pr-stacks-all-md` | -        | Format all mutable PRs |
 
 **Utilities:**
 
