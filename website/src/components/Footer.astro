@@ -1,0 +1,52 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
+
+<div class="lazyjj-credits">
+  <p>
+    Project by
+    <img src="https://github.com/ernesto-jimenez.png" alt="Ernesto Jiménez" />
+    <strong>Ernesto Jiménez</strong>
+    <a href="https://bsky.app/profile/ernesto-jimenez.com" target="_blank" rel="noopener noreferrer">Bluesky</a>
+    <a href="https://github.com/ernesto-jimenez" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </p>
+</div>
+
+<style>
+  .lazyjj-credits {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--sl-color-gray-5);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+
+  .lazyjj-credits p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .lazyjj-credits img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+
+  .lazyjj-credits a {
+    color: var(--sl-color-accent);
+    text-decoration: none;
+  }
+
+  .lazyjj-credits a:hover {
+    text-decoration: underline;
+  }
+</style>

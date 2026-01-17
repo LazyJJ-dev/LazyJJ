@@ -13,6 +13,9 @@ export default defineConfig({
       social: {
         github: "https://github.com/lazyjj-dev/lazyjj",
       },
+      components: {
+        Footer: './src/components/Footer.astro',
+      },
       sidebar: [
         {
           label: "Getting Started",

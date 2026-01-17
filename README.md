@@ -254,3 +254,7 @@ Mise will automatically:
 ## License
 
 MIT
+
+## Credits
+
+Project by <img src="https://github.com/ernesto-jimenez.png" width="24" height="24" style="border-radius: 50%; vertical-align: middle;"> **Ernesto Jiménez** · [Bluesky](https://bsky.app/profile/ernesto-jimenez.com) · [GitHub](https://github.com/ernesto-jimenez)
