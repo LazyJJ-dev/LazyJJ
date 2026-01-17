@@ -14,10 +14,15 @@ cat << 'EOF'
 LazyJJ - Supercharged JJ Configuration
 https://lazyjj.dev
 
+CORE
+  diffs       compact diff summary
+  gf          git fetch
+
 STACK WORKFLOW
   stack       view current stack
   stacks      view all your stacks
   top         go to top of stack
+  gc          clean up empty commits
   sync        fetch + rebase onto trunk
   start       fetch + new commit from trunk
   ss          push stack to remote
@@ -26,13 +31,13 @@ GITHUB
   prv         view current PR
   pro         open PR in browser
   sprs        create/update stacked PRs
+  prs         PR stack summary
+  uprs        update PR comments
 
 CLAUDE
   clstart     start Claude workspace
   clstop      stop Claude workspace
-
-MANAGEMENT
-  lazyjj-update    update LazyJJ to latest
+  clresolve   resolve conflicts
 
 Full docs: https://lazyjj.dev
 EOF

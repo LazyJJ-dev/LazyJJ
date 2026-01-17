@@ -56,23 +56,39 @@ After installation:
 # Initialize JJ in your Git repo
 jj git init --colocate
 
-# Start a new feature from trunk
-jj stack-start
+# Fetch and start a new stack from trunk
+jj start
 
-# Make changes (automatically in the commit!)
+# Make changes to a file
 vim src/feature.js
 
-# Describe your work
-jj describe -m "Add feature"
+# Commit with message
+jj commit -m "Add feature A"
 
-# Create next commit
-jj new
+# Create bookmark for this commit
+jj create feature-a
 
-# View your stack
-jj stack-view
+# Make more changes
+vim src/feature.js
 
-# Create stacked PRs
+# Commit with message
+jj commit -m "Add feature B"
+
+# Create another bookmark
+jj create feature-b
+
+# Submit the entire stack to remote
+jj stack-submit
+
+# Open PR forms for each bookmark in stack
 jj pr-stack-create
+
+# Add stack summary comments to each PR
+jj pr-stack-update
+
+# (After first PR is merged on GitHub)
+# Fetch and rebase remaining commits
+jj sync
 ```
 
 See the [Quick Start guide](https://lazyjj.dev/quickstart/) for more.
@@ -83,14 +99,46 @@ See the [Quick Start guide](https://lazyjj.dev/quickstart/) for more.
 
 Navigate and manage stacks of commits for stacked PRs:
 
-| Command        | Shortcut | Purpose                       |
-| -------------- | -------- | ----------------------------- |
-| `stack-view`   | `stack`  | View current stack with trunk |
-| `stacks-all`   | `stacks` | View all your stacks          |
-| `stack-top`    | `top`    | Jump to top of stack          |
-| `stack-bottom` | `bottom` | Jump to bottom of stack       |
-| `stack-sync`   | `sync`   | Fetch and rebase onto trunk   |
-| `stack-start`  | `start`  | Fresh start from trunk        |
+**Viewing your stacks:**
+
+| Command            | Shortcut  | Purpose                    |
+| ------------------ | --------- | -------------------------- |
+| `stack-view`       | `stack`   | View current stack         |
+| `stack-files`      | `stackls` | View stack with files      |
+| `stacks-all`       | `stacks`  | View all your stacks       |
+| `stacks-all-files` | `stacksls`| View all stacks with files |
+
+**Navigation & maintenance:**
+
+| Command       | Shortcut | Purpose                       |
+| ------------- | -------- | ----------------------------- |
+| `stack-top`   | `top`    | Jump to top of stack          |
+| `stack-gc`    | `gc`     | Clean up empty commits        |
+| `restack`     | -        | Rebase stack onto trunk       |
+| `restack-all` | -        | Rebase all stacks onto trunk  |
+
+**Bookmark operations:**
+
+| Command  | Shortcut | Purpose                      |
+| -------- | -------- | ---------------------------- |
+| `create` | -        | Create bookmark at @-        |
+| `tug`    | -        | Move bookmark to follow work |
+
+**Syncing & submitting:**
+
+| Command        | Shortcut | Purpose                     |
+| -------------- | -------- | --------------------------- |
+| `stack-start`  | `start`  | Fetch + new commit on trunk |
+| `stack-sync`   | `sync`   | Fetch + rebase onto trunk   |
+| `stack-submit` | `ss`     | Push stack to remote        |
+
+**Diffing:**
+
+| Command              | Shortcut | Purpose                      |
+| -------------------- | -------- | ---------------------------- |
+| `stack-diff`         | -        | Show diff from stack start   |
+| `stack-diff-summary` | -        | Diff summary from stack start|
+| `stack-diff-files`   | -        | List files changed in stack  |
 
 ### 🤖 Claude Code Integration
 
@@ -101,33 +149,61 @@ Streamlined worktree management for AI pair programming:
 | `claude-start`      | `clstart`   | Create JJ workspace + tmux session |
 | `claude-stop`       | `clstop`    | Stop and clean up workspace        |
 | `claude-resolve`    | `clresolve` | AI-assisted conflict resolution    |
-| `claude-review`     | `clreview`  | AI-assisted PR review              |
 | `claude-checkpoint` | -           | Save progress checkpoint           |
 
 ### 🔗 GitHub Integration
 
 Create and manage stacked PRs (requires `gh` CLI):
 
-| Command            | Shortcut | Purpose                   |
-| ------------------ | -------- | ------------------------- |
-| `pr-view`          | `prv`    | View current PR           |
-| `pr-open`          | `pro`    | Open PR in browser        |
-| `pr-stack-create`  | `sprs`   | Create/update stacked PRs |
-| `pr-stack-summary` | `prs`    | Generate PR stack summary |
+**Viewing PRs:**
+
+| Command   | Shortcut | Purpose            |
+| --------- | -------- | ------------------ |
+| `pr-view` | `prv`    | View current PR    |
+| `pr-open` | `pro`    | Open PR in browser |
+
+**Stacked PR workflow:**
+
+| Command            | Shortcut | Purpose                       |
+| ------------------ | -------- | ----------------------------- |
+| `pr-stack`         | -        | List bookmarks in stack       |
+| `pr-stack-create`  | `sprs`   | Create/update stacked PRs     |
+| `pr-stack-summary` | `prs`    | Generate PR stack summary     |
+| `pr-stack-update`  | `uprs`   | Update PR comments with stack |
+
+**PR formatting:**
+
+| Command            | Shortcut | Purpose                          |
+| ------------------ | -------- | -------------------------------- |
+| `pr-stack-md`      | `prmd`   | Format current stack (deprecated)|
+| `pr-stacks-all-md` | -        | Format all mutable PRs           |
+
+**Utilities:**
+
+| Command       | Shortcut | Purpose                     |
+| ------------- | -------- | --------------------------- |
+| `github-repo` | `repo`   | Get owner/repo from remote  |
+| `gh`          | -        | GitHub CLI wrapper          |
 
 ### ⚡ Core Aliases
 
 Essential shortcuts and value-add commands:
 
-| Alias   | Command                     | Purpose              |
-| ------- | --------------------------- | -------------------- |
-| `st`    | `status`                    | Quick status         |
-| `d`     | `diff`                      | View changes         |
-| `l`     | `log --limit 10`            | Quick log            |
-| `n`     | `new`                       | New commit           |
-| `e`     | `edit`                      | Edit commit          |
-| `diffs` | `diff --summary --no-pager` | Compact diff summary |
-| `gf`    | `git fetch`                 | Fetch from remote    |
+| Command        | Shortcut | Purpose              |
+| -------------- | -------- | -------------------- |
+| `diff-summary` | `diffs`  | Compact diff summary |
+| `diff-files`   | `diffls` | List changed files   |
+| `log-short`    | -        | Quick log (10 items) |
+| `git fetch`    | `gf`     | Fetch from remote    |
+
+### 🔧 Self-Management
+
+Manage LazyJJ itself:
+
+| Command         | Purpose          |
+| --------------- | ---------------- |
+| `lazyjj`        | Show cheat sheet |
+| `lazyjj-update` | Update to latest |
 
 ## Configuration
 
