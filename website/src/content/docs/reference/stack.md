@@ -52,14 +52,13 @@ jj stacks-all
 | Command | Shortcut | Purpose |
 |---------|----------|---------|
 | `stack-top` | `top` | Jump to top of stack |
-| `stack-bottom` | `bottom` | Jump to bottom of stack |
 
 ```bash
 # Go to the latest commit in your stack
 jj stack-top
 
-# Go to the first commit in your stack
-jj stack-bottom
+# Go to a specific commit using its change ID
+jj edit abc
 ```
 
 ## Syncing with Trunk
@@ -68,7 +67,7 @@ jj stack-bottom
 |---------|----------|---------|
 | `stack-sync` | `sync` | Fetch and rebase onto trunk |
 | `stack-start` | `start` | Fetch and start fresh from trunk |
-| `stack-rebase` | `restack` | Rebase stack onto trunk (no fetch) |
+| `restack` | - | Rebase stack onto trunk (no fetch) |
 
 ```bash
 # Update your stack with latest trunk
@@ -78,7 +77,7 @@ jj stack-sync
 jj stack-start
 
 # Rebase without fetching
-jj stack-rebase
+jj restack
 ```
 
 ## Pushing and Bookmarks
@@ -86,18 +85,18 @@ jj stack-rebase
 | Command | Shortcut | Purpose |
 |---------|----------|---------|
 | `stack-submit` | `ss` | Smart push - push stack to remote |
-| `bookmark-tug` | `tug` | Move bookmark to parent commit |
-| `bookmark-create` | `create` | Create bookmark at parent commit |
+| `tug` | - | Move bookmark to parent commit |
+| `create` | - | Create bookmark at parent commit |
 
 ```bash
 # Push your stack
 jj stack-submit
 
 # Move a bookmark to the previous commit
-jj bookmark-tug
+jj tug
 
 # Create a new bookmark at the previous commit
-jj bookmark-create my-feature
+jj create my-feature
 ```
 
 ## Cleanup

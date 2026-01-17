@@ -40,7 +40,7 @@ JJ treats conflicts as data you can commit, work around, and resolve whenever co
 Jujutsu is powerful but requires configuration to unlock its full potential. LazyJJ is a ready-to-use distribution—think "LazyVim for JJ"—that provides:
 
 - **Sensible defaults** - Colors, pager settings, and UI tweaks
-- **Core aliases** - Essential shortcuts everyone needs (`jj st`, `jj l`, `jj d`)
+- **Core aliases** - Essential shortcuts for common operations (`jj gf`, `jj diffs`, `jj stack`)
 - **Stack workflow** - Commands for working with commit stacks
 - **GitHub integration** - Create and manage stacked PRs with `gh` CLI
 - **Claude integration** - AI-assisted development workflows
@@ -59,7 +59,7 @@ LazyJJ follows these principles:
 A "stack" in JJ is a series of commits from where you diverged from trunk to your current position. LazyJJ provides commands to:
 
 - View your current stack (`jj stack-view`)
-- Navigate within your stack (`jj stack-top`, `jj stack-bottom`)
+- Navigate within your stack (`jj stack-top`, `jj edit <change-id>`)
 - Sync your stack with trunk (`jj stack-sync`)
 - Create stacked PRs (`jj pr-stack-create`)
 

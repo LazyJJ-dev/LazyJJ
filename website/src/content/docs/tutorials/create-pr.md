@@ -55,10 +55,10 @@ You can run this multiple times to update the message.
 PRs need a branch name. Create a bookmark (JJ's term for a branch):
 
 ```bash
-jj bookmark-create auth-feature
+jj create auth-feature
 ```
 
-This creates a bookmark pointing at your current commit.
+This creates a bookmark pointing at your parent commit (`@-`).
 
 > **Note about Bookmarks vs Branches**: JJ calls them "bookmarks" while GitHub calls them "branches." They're the same thing. Why the different term? JJ bookmarks don't auto-follow like Git branches—you must manually update them. This is THE most common confusion for Git users. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) for details.
 
@@ -110,7 +110,7 @@ jj describe -m "feat: Add user authentication
 - Add session handling"
 
 # Create bookmark for PR
-jj bookmark-create auth-feature
+jj create auth-feature
 
 # Push and create PR
 jj pr-stack-create

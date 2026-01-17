@@ -40,7 +40,7 @@ vim src/database/migrations/001_users.sql
 jj describe -m "Add user database schema"
 
 # Create a bookmark for this PR
-jj bookmark-create db-schema
+jj create db-schema
 
 # Start the next commit
 jj new
@@ -61,7 +61,7 @@ vim src/models/user.test.js
 jj describe -m "Add user model"
 
 # Create a bookmark
-jj bookmark-create user-model
+jj create user-model
 
 # Start the next commit
 jj new
@@ -80,7 +80,7 @@ vim src/api/users.test.js
 jj describe -m "Add user API endpoints"
 
 # Create a bookmark
-jj bookmark-create user-api
+jj create user-api
 ```
 
 ## Step 5: View Your Stack
@@ -124,19 +124,19 @@ jj stack-start
 # First commit - database schema
 vim src/database/schema.sql
 jj describe -m "Add user database schema"
-jj bookmark-create db-schema
+jj create db-schema
 jj new
 
 # Second commit - model layer
 vim src/models/user.js
 jj describe -m "Add user model"
-jj bookmark-create user-model
+jj create user-model
 jj new
 
 # Third commit - API layer
 vim src/api/users.js
 jj describe -m "Add user API endpoints"
-jj bookmark-create user-api
+jj create user-api
 
 # View the stack
 jj stack-view
@@ -160,9 +160,9 @@ jj stack-files
 Use descriptive names that indicate the order or relationship:
 
 ```bash
-jj bookmark-create feature/01-schema
-jj bookmark-create feature/02-model
-jj bookmark-create feature/03-api
+jj create feature/01-schema
+jj create feature/02-model
+jj create feature/03-api
 ```
 
 ### Don't Forget `jj new`

@@ -34,16 +34,6 @@ jj stack-top
 
 Use this after editing a mid-stack commit to return to where you were.
 
-## Jump to Bottom
-
-Go to the oldest commit in your stack (just above trunk):
-
-```bash
-jj stack-bottom
-```
-
-Useful when you need to make foundational changes.
-
 ## Edit Any Commit
 
 Jump to a specific commit using its change ID:

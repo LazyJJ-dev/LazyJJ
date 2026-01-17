@@ -34,13 +34,13 @@ Want deeper explanation? Read the [Mental Model guide](/guides/mental-model/) af
 After [installing LazyJJ](/installation/), try these commands in any JJ repository:
 
 ```bash
-# Check status (shortcut: jj st)
+# Check status
 jj status
 
-# View recent history (shortcut: jj l)
+# View recent history
 jj log-short
 
-# View changes (shortcut: jj d)
+# View changes
 jj diff
 ```
 
@@ -116,9 +116,6 @@ jj stack-view
 
 # Navigate to the top of your stack
 jj stack-top
-
-# Navigate to the bottom
-jj stack-bottom
 
 # Sync your stack with the latest trunk
 jj stack-sync
