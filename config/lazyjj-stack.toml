@@ -81,7 +81,7 @@ restack-all = ["rebase", "-b", "roots(stacks)", "-d", "trunk()", "--skip-emptied
 # What: Moves the current bookmark to point at @- (parent commit).
 # When: Use after jj commit to keep your bookmark pointing at your latest described commit.
 # Usage: jj commit -m "feature"; jj tug
-tug = ["bookmark", "move", "--to", "@-"]
+tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 
 # bookmark-create - Create a new bookmark at @-
 # What: Creates a named bookmark pointing at your previous commit (@-).
