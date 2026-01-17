@@ -5,12 +5,27 @@
 <h1 align="center">LazyJJ</h1>
 
 <p align="center">
-  <strong>Ready-to-use Jujutsu configuration for stacked PR workflows</strong>
+  <strong>Ship stacked PRs without fighting your VCS</strong>
 </p>
 
 <p align="center">
   Stack commands • Claude Code integration • GitHub helpers • Sensible defaults
 </p>
+
+<p align="center">
+  <a href="https://github.com/lazyjj-dev/lazyjj/stargazers"><img src="https://img.shields.io/github/stars/lazyjj-dev/lazyjj?style=flat-square" alt="GitHub stars"></a>
+  <a href="https://github.com/lazyjj-dev/lazyjj/blob/main/LICENSE"><img src="https://img.shields.io/github/license/lazyjj-dev/lazyjj?style=flat-square" alt="License"></a>
+  <a href="https://lazyjj.dev"><img src="https://img.shields.io/badge/docs-lazyjj.dev-blue?style=flat-square" alt="Documentation"></a>
+</p>
+
+---
+
+## Prerequisites
+
+Before installing LazyJJ, you need:
+
+- **[Jujutsu (JJ)](https://jj-vcs.github.io/jj/latest/install-and-setup/)** - LazyJJ is a configuration layer on top of JJ, not a standalone tool
+- **[GitHub CLI (`gh`)](https://cli.github.com/)** - Required for GitHub PR features (optional if not using GitHub integration)
 
 ---
 
@@ -34,6 +49,18 @@ Jujutsu is a modern version control system that makes stacking natural:
 - **Native stacking** - Built into the VCS, not bolted on
 - **First-class conflicts** - Don't block your workflow
 - **Automatic rebasing** - Edit any commit, descendants rebase automatically
+
+## Problems This Solves
+
+- **Tired of fighting Git rebases?** JJ handles rebasing automatically when you edit commits
+- **Graphite metadata keeps breaking?** JJ's native stacking means no external metadata to corrupt
+- **Claude Code creating messy commit histories?** Isolated workspaces keep AI changes contained until you're ready to merge
+
+## Who Is This For?
+
+- **Teams shipping stacked PRs** - Get a complete stacking workflow without learning all of JJ's configuration options
+- **AI-assisted development** - Claude Code integration with worktree isolation prevents AI from disrupting your main work
+- **Developers migrating from Graphite** - Familiar stacking workflow without the third-party dependency
 
 ## Installation
 

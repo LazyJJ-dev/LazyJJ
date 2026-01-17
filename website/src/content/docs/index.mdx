@@ -1,9 +1,9 @@
 ---
 title: LazyJJ
-description: Ready-to-use Jujutsu configuration for stacked PR workflows
+description: Ship stacked PRs faster with LazyJJ - a ready-to-use Jujutsu configuration with GitHub integration and Claude Code support
 template: splash
 hero:
-  tagline: Stack commands • Claude Code integration • GitHub helpers • Built on Jujutsu's native stacking
+  tagline: Ship stacked PRs without fighting your VCS
   image:
     file: ../../assets/logo-light.svg
   actions:
@@ -24,6 +24,25 @@ import { Card, CardGrid } from "@astrojs/starlight/components";
 curl -fsSL https://lazyjj.dev/install.sh | bash
 ```
 
+Requires [Jujutsu](https://jj-vcs.github.io/jj/latest/install-and-setup/) to be installed first.
+
+## Problems We Solve
+
+<CardGrid>
+  <Card title="Git rebases are error-prone" icon="warning">
+    JJ's automatic rebasing handles descendant commits when you edit history.
+    No more rebase conflicts from merge commits.
+  </Card>
+  <Card title="Graphite metadata breaks" icon="error">
+    JJ's native stacking is built into the VCS itself. No external metadata
+    files to corrupt or sync issues to debug.
+  </Card>
+  <Card title="AI coding creates messy history" icon="puzzle">
+    Claude Code integration uses isolated workspaces. AI changes stay contained
+    until you're ready to merge.
+  </Card>
+</CardGrid>
+
 ## Why LazyJJ?
 
 Jujutsu (JJ) is powerful but requires configuration. **LazyJJ gives you a complete stacked workflow out of the box.**
@@ -31,20 +50,20 @@ Jujutsu (JJ) is powerful but requires configuration. **LazyJJ gives you a comple
 ## Features
 
 <CardGrid stagger>
-  <Card title="Stack Commands" icon="list-format">
+  <Card title="Ship Faster with Stacked PRs" icon="list-format">
     Navigate and manage stacks with `stack-view`, `stack-top`, `stack-sync`.
-    Create stacked PRs with `pr-stack-create`.
+    Create and update stacked PRs with a single command.
   </Card>
-  <Card title="Claude Integration" icon="rocket">
-    Streamlined worktree management for Claude Code. Create isolated workspaces
-    with `claude-start`, AI conflict resolution.
+  <Card title="AI Pair Programming Ready" icon="rocket">
+    Streamlined worktree management for Claude Code. Isolated workspaces prevent
+    AI from disrupting your main work. AI-assisted conflict resolution included.
   </Card>
-  <Card title="GitHub Helpers" icon="github">
-    Quick PR access with `pr-view`, `pr-open`. Generate stack summaries. No
-    third-party service dependency.
+  <Card title="GitHub Without Third Parties" icon="github">
+    Create stacked PRs directly with GitHub CLI. Auto-generate stack summaries
+    in PR descriptions. No external service dependency or metadata sync issues.
   </Card>
-  <Card title="Sensible Defaults" icon="setting">
-    Colors, pager settings, UI tweaks. Revset aliases (trunk, stack, stacks).
-    Shortcuts for common operations.
+  <Card title="Works Out of the Box" icon="setting">
+    Pre-configured colors, pager settings, and UI tweaks. Revset aliases for
+    trunk, stack, and stacks. Shortcuts for common operations ready to use.
   </Card>
 </CardGrid>

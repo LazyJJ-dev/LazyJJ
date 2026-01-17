@@ -9,9 +9,59 @@ export default defineConfig({
     starlight({
       title: "LazyJJ",
       description:
-        "A ready-to-use Jujutsu distribution with sensible defaults and modern workflows",
+        "Ship stacked PRs faster with LazyJJ - a ready-to-use Jujutsu configuration with GitHub integration and Claude Code support",
+      head: [
+        {
+          tag: "meta",
+          attrs: {
+            property: "og:image",
+            content: "https://lazyjj.dev/og-image.png",
+          },
+        },
+        {
+          tag: "meta",
+          attrs: {
+            name: "twitter:card",
+            content: "summary_large_image",
+          },
+        },
+        {
+          tag: "meta",
+          attrs: {
+            name: "twitter:image",
+            content: "https://lazyjj.dev/og-image.png",
+          },
+        },
+        {
+          tag: "script",
+          attrs: {
+            type: "application/ld+json",
+          },
+          content: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "LazyJJ",
+            description:
+              "A ready-to-use Jujutsu configuration for stacked PR workflows with GitHub integration and Claude Code support",
+            applicationCategory: "DeveloperApplication",
+            operatingSystem: "macOS, Linux",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
+            url: "https://lazyjj.dev",
+            author: {
+              "@type": "Person",
+              name: "Ernesto Jiménez",
+              url: "https://github.com/ernesto-jimenez",
+            },
+          }),
+        },
+      ],
       social: {
         github: "https://github.com/lazyjj-dev/lazyjj",
+        blueSky: "https://bsky.app/profile/ernesto-jimenez.com",
       },
       components: {
         Footer: './src/components/Footer.astro',
