@@ -11,6 +11,8 @@ set -e
 LAZYJJ_VERSION="${LAZYJJ_VERSION:-latest}"
 LAZYJJ_DIR="${HOME}/.config/jj/lazyjj"
 CONF_D="${HOME}/.config/jj/conf.d"
+FORCE_INSTALL=false
+INSTALLATION_STARTED=false
 
 # Colors
 RED='\033[0;31m'
@@ -20,96 +22,156 @@ NC='\033[0m' # No Color
 
 info() { echo -e "${GREEN}[lazyjj]${NC} $1"; }
 warn() { echo -e "${YELLOW}[lazyjj]${NC} $1"; }
-error() { echo -e "${RED}[lazyjj]${NC} $1"; exit 1; }
+error() {
+	echo -e "${RED}[lazyjj]${NC} $1"
+	exit 1
+}
+
+cleanup_on_failure() {
+	if [ "$INSTALLATION_STARTED" = true ] && [ $? -ne 0 ]; then
+		warn "Installation failed, rolling back changes..."
+
+		# Remove symlinks from conf.d
+		if [ -d "$CONF_D" ]; then
+			for link in "$CONF_D"/lazyjj-*.toml; do
+				if [ -L "$link" ]; then
+					rm "$link"
+				fi
+			done
+		fi
+
+		# Remove lazyjj directory
+		if [ -d "$LAZYJJ_DIR" ]; then
+			rm -rf "$LAZYJJ_DIR"
+		fi
+
+		warn "Rollback completed"
+	fi
+}
+
+trap cleanup_on_failure EXIT
 
 uninstall() {
-    info "Uninstalling LazyJJ..."
+	info "Uninstalling LazyJJ..."
 
-    # Remove symlinks from conf.d
-    if [ -d "$CONF_D" ]; then
-        for link in "$CONF_D"/lazyjj-*.toml; do
-            if [ -L "$link" ]; then
-                rm "$link"
-                info "Removed symlink: $(basename "$link")"
-            fi
-        done
-    fi
+	# Remove symlinks from conf.d
+	if [ -d "$CONF_D" ]; then
+		for link in "$CONF_D"/lazyjj-*.toml; do
+			if [ -L "$link" ]; then
+				rm "$link"
+				info "Removed symlink: $(basename "$link")"
+			fi
+		done
+	fi
 
-    # Remove lazyjj directory
-    if [ -d "$LAZYJJ_DIR" ]; then
-        rm -rf "$LAZYJJ_DIR"
-        info "Removed $LAZYJJ_DIR"
-    fi
+	# Remove lazyjj directory
+	if [ -d "$LAZYJJ_DIR" ]; then
+		rm -rf "$LAZYJJ_DIR"
+		info "Removed $LAZYJJ_DIR"
+	fi
 
-    info "LazyJJ uninstalled successfully!"
+	info "LazyJJ uninstalled successfully!"
 }
 
 install() {
-    info "Installing LazyJJ..."
+	info "Installing LazyJJ..."
 
-    # Check for jj
-    if ! command -v jj &> /dev/null; then
-        error "jj (Jujutsu) is not installed. Install it first: https://jj-vcs.github.io/jj/latest/install-and-setup/"
-    fi
+	# Check for jj
+	if ! command -v jj &>/dev/null; then
+		error "jj (Jujutsu) is not installed. Install it first: https://jj-vcs.github.io/jj/latest/install-and-setup/"
+	fi
 
-    # Create directories
-    mkdir -p "$LAZYJJ_DIR"
-    mkdir -p "$CONF_D"
+	# Mark installation as started for rollback purposes
+	INSTALLATION_STARTED=true
 
-    # Download or copy config files
-    if [ -d "$(dirname "$0")/config" ]; then
-        # Local install (development)
-        info "Installing from local directory..."
-        cp -r "$(dirname "$0")/config" "$LAZYJJ_DIR/"
-    else
-        # Download from GitHub releases
-        info "Downloading LazyJJ $LAZYJJ_VERSION..."
+	# Create directories
+	mkdir -p "$LAZYJJ_DIR"
+	mkdir -p "$CONF_D"
 
-        if [ "$LAZYJJ_VERSION" = "latest" ]; then
-            DOWNLOAD_URL="https://github.com/lazyjj-dev/lazyjj/releases/latest/download/lazyjj-config.tar.gz"
-        else
-            DOWNLOAD_URL="https://github.com/lazyjj-dev/lazyjj/releases/download/${LAZYJJ_VERSION}/lazyjj-config.tar.gz"
-        fi
+	# Download or copy config files
+	if [ -d "$(dirname "$0")/config" ]; then
+		# Local install (development)
+		info "Installing from local directory..."
+		cp -r "$(dirname "$0")/config" "$LAZYJJ_DIR/"
+	else
+		# Download from GitHub releases
+		info "Downloading LazyJJ $LAZYJJ_VERSION..."
 
-        if command -v curl &> /dev/null; then
-            curl -fsSL "$DOWNLOAD_URL" | tar xz -C "$LAZYJJ_DIR"
-        elif command -v wget &> /dev/null; then
-            wget -qO- "$DOWNLOAD_URL" | tar xz -C "$LAZYJJ_DIR"
-        else
-            error "Neither curl nor wget found. Please install one of them."
-        fi
-    fi
+		if [ "$LAZYJJ_VERSION" = "latest" ]; then
+			DOWNLOAD_URL="https://github.com/lazyjj-dev/lazyjj/releases/latest/download/lazyjj-config.tar.gz"
+		else
+			DOWNLOAD_URL="https://github.com/lazyjj-dev/lazyjj/releases/download/${LAZYJJ_VERSION}/lazyjj-config.tar.gz"
+		fi
 
-    # Create symlinks
-    info "Creating symlinks in conf.d..."
-    for config_file in "$LAZYJJ_DIR/config"/lazyjj-*.toml; do
-        if [ -f "$config_file" ]; then
-            filename=$(basename "$config_file")
-            ln -sf "$config_file" "$CONF_D/$filename"
-            info "  Linked: $filename"
-        fi
-    done
+		if command -v curl &>/dev/null; then
+			curl -fsSL "$DOWNLOAD_URL" | tar xz -C "$LAZYJJ_DIR"
+		elif command -v wget &>/dev/null; then
+			wget -qO- "$DOWNLOAD_URL" | tar xz -C "$LAZYJJ_DIR"
+		else
+			error "Neither curl nor wget found. Please install one of them."
+		fi
+	fi
 
-    info ""
-    info "LazyJJ installed successfully!"
-    info ""
-    info "Your JJ is now supercharged with:"
-    info "  - Core aliases (st, d, l, n, e)"
-    info "  - Stack workflow (stack, stacks, top, bottom, sync)"
-    info "  - GitHub integration (prv, pro, sprs)"
-    info "  - Claude integration (clstart, clstop)"
-    info ""
-    info "Get started: jj st"
-    info "Quick reference: jj lazyjj"
-    info "Full docs: https://lazyjj.dev"
+	# Validate that config files were downloaded/copied
+	info "Validating installation..."
+	config_count=$(find "$LAZYJJ_DIR/config" -name "lazyjj-*.toml" 2>/dev/null | wc -l)
+	if [ "$config_count" -eq 0 ]; then
+		error "No config files found after installation. Installation failed."
+	fi
+	info "Found $config_count config file(s)"
+
+	# Create symlinks
+	info "Creating symlinks in conf.d..."
+	symlinks_created=0
+	for config_file in "$LAZYJJ_DIR/config"/lazyjj-*.toml; do
+		if [ -f "$config_file" ]; then
+			filename=$(basename "$config_file")
+			target_path="$CONF_D/$filename"
+
+			# Check if target exists and is not a symlink
+			if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
+				if [ "$FORCE_INSTALL" = true ]; then
+					warn "Overwriting existing file: $filename"
+					rm "$target_path"
+				else
+					warn "File $filename already exists and is not a symlink. Skipping..."
+					warn "Use --force to overwrite existing files"
+					continue
+				fi
+			fi
+
+			ln -sf "$config_file" "$target_path"
+			info "  Linked: $filename"
+			symlinks_created=$((symlinks_created + 1))
+		fi
+	done
+
+	if [ "$symlinks_created" -eq 0 ]; then
+		error "No symlinks were created. Installation failed."
+	fi
+
+	info ""
+	info "LazyJJ installed successfully!"
+	info ""
+	info "Quick reference: jj lazyjj"
+	info "Full docs: https://lazyjj.dev"
 }
 
 # Parse arguments
-case "${1:-}" in
-    --uninstall)
-        uninstall
-        ;;
-    *)
-        install
-        ;;
-esac
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+	--uninstall)
+		uninstall
+		exit 0
+		;;
+	--force)
+		FORCE_INSTALL=true
+		shift
+		;;
+	*)
+		error "Unknown option: $1\nUsage: $0 [--uninstall] [--force]"
+		;;
+	esac
+done
+
+install
