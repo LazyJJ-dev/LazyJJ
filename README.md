@@ -44,7 +44,7 @@ curl -fsSL https://lazyjj.dev/install.sh | bash
 Or manually:
 
 ```bash
-git clone https://github.com/lazyjj-dev/lazyjj.git ~/.config/jj/lazyjj
+jj git clone https://github.com/lazyjj-dev/lazyjj.git ~/.config/jj/lazyjj
 cd ~/.config/jj/lazyjj && ./install.sh
 ```
 
