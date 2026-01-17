@@ -101,21 +101,21 @@ Navigate and manage stacks of commits for stacked PRs:
 
 **Viewing your stacks:**
 
-| Command            | Shortcut  | Purpose                    |
-| ------------------ | --------- | -------------------------- |
-| `stack-view`       | `stack`   | View current stack         |
-| `stack-files`      | `stackls` | View stack with files      |
-| `stacks-all`       | `stacks`  | View all your stacks       |
-| `stacks-all-files` | `stacksls`| View all stacks with files |
+| Command            | Shortcut   | Purpose                    |
+| ------------------ | ---------- | -------------------------- |
+| `stack-view`       | `stack`    | View current stack         |
+| `stack-files`      | `stackls`  | View stack with files      |
+| `stacks-all`       | `stacks`   | View all your stacks       |
+| `stacks-all-files` | `stacksls` | View all stacks with files |
 
 **Navigation & maintenance:**
 
-| Command       | Shortcut | Purpose                       |
-| ------------- | -------- | ----------------------------- |
-| `stack-top`   | `top`    | Jump to top of stack          |
-| `stack-gc`    | `gc`     | Clean up empty commits        |
-| `restack`     | -        | Rebase stack onto trunk       |
-| `restack-all` | -        | Rebase all stacks onto trunk  |
+| Command       | Shortcut | Purpose                      |
+| ------------- | -------- | ---------------------------- |
+| `stack-top`   | `top`    | Jump to top of stack         |
+| `stack-gc`    | `gc`     | Clean up empty commits       |
+| `restack`     | -        | Rebase stack onto trunk      |
+| `restack-all` | -        | Rebase all stacks onto trunk |
 
 **Bookmark operations:**
 
@@ -134,11 +134,11 @@ Navigate and manage stacks of commits for stacked PRs:
 
 **Diffing:**
 
-| Command              | Shortcut | Purpose                      |
-| -------------------- | -------- | ---------------------------- |
-| `stack-diff`         | -        | Show diff from stack start   |
-| `stack-diff-summary` | -        | Diff summary from stack start|
-| `stack-diff-files`   | -        | List files changed in stack  |
+| Command              | Shortcut | Purpose                       |
+| -------------------- | -------- | ----------------------------- |
+| `stack-diff`         | -        | Show diff from stack start    |
+| `stack-diff-summary` | -        | Diff summary from stack start |
+| `stack-diff-files`   | -        | List files changed in stack   |
 
 ### 🤖 Claude Code Integration
 
@@ -173,17 +173,17 @@ Create and manage stacked PRs (requires `gh` CLI):
 
 **PR formatting:**
 
-| Command            | Shortcut | Purpose                          |
-| ------------------ | -------- | -------------------------------- |
-| `pr-stack-md`      | `prmd`   | Format current stack (deprecated)|
-| `pr-stacks-all-md` | -        | Format all mutable PRs           |
+| Command            | Shortcut | Purpose                           |
+| ------------------ | -------- | --------------------------------- |
+| `pr-stack-md`      | `prmd`   | Format current stack (deprecated) |
+| `pr-stacks-all-md` | -        | Format all mutable PRs            |
 
 **Utilities:**
 
-| Command       | Shortcut | Purpose                     |
-| ------------- | -------- | --------------------------- |
-| `github-repo` | `repo`   | Get owner/repo from remote  |
-| `gh`          | -        | GitHub CLI wrapper          |
+| Command       | Shortcut | Purpose                    |
+| ------------- | -------- | -------------------------- |
+| `github-repo` | `repo`   | Get owner/repo from remote |
+| `gh`          | -        | GitHub CLI wrapper         |
 
 ### ⚡ Core Aliases
 
@@ -220,6 +220,30 @@ Your personal config (name, email) stays in `~/.config/jj/config.toml`.
 - 📚 [Stack Workflow](https://lazyjj.dev/reference/stack/)
 - 🔗 [GitHub Integration](https://lazyjj.dev/integrations/github/)
 - 🤖 [Claude Integration](https://lazyjj.dev/integrations/claude/)
+
+## Contributing
+
+Contributions are welcome! This project uses [mise](https://mise.jdx.dev) to manage the development environment.
+
+### Development Setup
+
+1. Install mise:
+
+   ```bash
+   curl https://mise.run | sh
+   ```
+
+2. Clone the repository and let mise set up your environment:
+   ```bash
+   jj git clone https://github.com/lazyjj-dev/lazyjj.git
+   cd lazyjj
+   mise install
+   ```
+
+Mise will automatically:
+
+- Install the latest version of `jj`
+- Set up the `JJ_CONFIG` environment variable to work with the repository configuration
 
 ## Uninstall
 
