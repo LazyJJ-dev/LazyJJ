@@ -21,7 +21,7 @@
 # What: Shows all commits in your stack along with trunk for context.
 # When: Use frequently to visualize your work and its relationship to trunk.
 # Usage: jj stack-view
-stack-view = ["log", "-r", "trunk::stack"]
+stack-view = ["log", "-r", "stack | trunk() | present(@)"]
 
 # stack-files - View stack with file changes listed
 # What: Shows stack commits with a summary of changed files per commit.
