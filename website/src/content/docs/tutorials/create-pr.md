@@ -60,7 +60,7 @@ jj create auth-feature
 
 This creates a bookmark pointing at your parent commit (`@-`).
 
-> **Note about Bookmarks vs Branches**: JJ calls them "bookmarks" while GitHub calls them "branches." They're the same thing. Why the different term? JJ bookmarks don't auto-follow like Git branches—you must manually update them. This is THE most common confusion for Git users. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) for details.
+> **Note**: JJ bookmarks don't auto-follow like Git branches. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) if this trips you up.
 
 ## Step 5: Push and Create the PR
 

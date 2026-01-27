@@ -15,8 +15,6 @@ In JJ, conflicts are just another state:
 - ✅ You can resolve conflicts later—or never
 - ✅ Resolving once propagates through stacks
 
-Research shows 15 out of 20 major JJ resources highlight this as a transformative feature.
-
 ## Creating a Conflict (Example)
 
 Let's deliberately create a conflict to see how JJ handles it:

@@ -46,8 +46,6 @@ jj create db-schema
 jj new
 ```
 
-> **Notice**: No `git add` needed! In JJ, changes are automatically part of the commit. This feels strange initially but becomes natural. See [Mental Model](/guides/mental-model/) for why this works.
-
 ## Step 3: Second Commit
 
 Build on the first commit:

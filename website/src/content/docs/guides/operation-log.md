@@ -73,7 +73,7 @@ jj undo  # Keep going back
 - Resolved conflicts wrong? `jj undo`
 - Accidentally deleted a bookmark? `jj undo`
 
-There's no limit to what `jj undo` can reverse. Research shows this is mentioned in 14 out of 20 major JJ guides as a transformative feature.
+There's no limit to what `jj undo` can reverse.
 
 ## Time Travel with `jj op restore`
 
@@ -195,7 +195,7 @@ The operation log fundamentally changes how you interact with version control:
 - "Experiment first, commit to the approach after"
 - Safety enables exploration
 
-Research across 20+ guides shows developers consistently report being more willing to experiment once they trust `jj undo`.
+Developers consistently report being more willing to experiment once they trust `jj undo`.
 
 ## Operation Log Limitations
 

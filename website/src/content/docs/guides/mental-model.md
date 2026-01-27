@@ -176,19 +176,6 @@ jj edit commit-3
 
 As one developer put it: "It's honestly time traveler stuff. You just go back and edit it. At any time. When you're done, jj automatically rebases all subsequent changes... **IT'S ACTUALLY AMAZING**."
 
-## The Learning Curve
-
-Research across 20+ guides and community discussions shows a consistent pattern:
-
-- **First 30 minutes**: Confusion. "Where's git add?" "Why didn't my branch move?"
-- **Hours 1-4**: Awkwardness. Muscle memory fights the new model.
-- **Hours 4-8**: The "click." Suddenly it makes sense.
-- **After 8 hours**: "I'll never go back to Git."
-
-One developer: "I became comfortable enough with jj to replace git entirely in **one day**."
-
-Don't fight the model. Let yourself think differently for a few hours. It's worth it.
-
 ## Why This Model is Better
 
 ### No Lost Work
@@ -240,6 +227,4 @@ Now that you understand the mental model:
 - Try the [Quick Start](/quickstart/) with this new understanding
 - Learn about the [Operation Log](/guides/operation-log/) (your safety net)
 - Read [Common Mistakes](/guides/common-mistakes/) to avoid frustration
-- See [Git vs JJ](/guides/git-differences/) for detailed comparisons
-
-Give yourself 4-8 hours. The "aha moment" is real.
+- See the [Git → JJ Quick Reference](/guides/git-differences/) for command mappings
