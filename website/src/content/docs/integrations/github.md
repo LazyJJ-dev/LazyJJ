@@ -103,19 +103,7 @@ One of the most common sources of confusion:
 
 ### Why Bookmarks Don't Auto-Follow
 
-Unlike Git branches, JJ bookmarks stay where you set them:
-
-```bash
-jj create my-feature  # Bookmark at parent commit (@-)
-jj new -m "More work" # Create new commit
-jj log
-# my-feature is still at the old commit!
-
-# Update manually:
-jj bookmark set my-feature -r @
-```
-
-Research shows 11 out of 20 JJ resources mention this as a common confusion. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) for details.
+Unlike Git branches, JJ bookmarks stay where you set them. Update manually with `jj bookmark set my-feature -r @`. See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow) for details.
 
 ### The `ghbranch` Revset
 
@@ -175,4 +163,4 @@ gh pr edit my-branch --base other-branch
 
 ### My Bookmark Didn't Update
 
-If you're wondering why your bookmark didn't move when you created a new commit, see [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow). This is THE most common confusion for Git users transitioning to JJ.
+See [Common Mistakes](/guides/common-mistakes/#mistake-2-expecting-bookmarks-to-auto-follow).

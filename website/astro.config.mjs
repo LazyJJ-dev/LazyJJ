@@ -80,9 +80,8 @@ export default defineConfig({
           items: [
             { label: "Understanding JJ's Mental Model", slug: "guides/mental-model" },
             { label: "The Operation Log", slug: "guides/operation-log" },
-            { label: "Git vs JJ", slug: "guides/git-differences" },
-            { label: "LazyJJ vs Graphite", slug: "guides/graphite-comparison" },
-            { label: "From Graphite to LazyJJ", slug: "guides/from-graphite" },
+            { label: "Git → JJ Quick Reference", slug: "guides/git-differences" },
+            { label: "LazyJJ vs Graphite", slug: "guides/from-graphite" },
             { label: "Common Mistakes", slug: "guides/common-mistakes" },
           ],
         },

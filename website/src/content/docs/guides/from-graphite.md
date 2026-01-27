@@ -1,41 +1,63 @@
 ---
-title: From Graphite to LazyJJ
-description: Escaping Graphite's limitations - why JJ does stacking better
+title: LazyJJ vs Graphite
+description: Why LazyJJ is a better choice for stacked workflows, plus a migration guide
 ---
 
-If you're here, you've likely hit one of Graphite's frustrations: signed commits breaking, collaboration friction, metadata fragility, or the fundamental "branches-vs-patches impedance mismatch" that can never be fully resolved.
+Both LazyJJ and [Graphite](https://graphite.dev) provide stacked PR workflows, but they take fundamentally different approaches. JJ offers **native stacking** built into the version control system itself—not bolted onto Git.
 
-JJ offers what Graphite promised but couldn't deliver: **native stacking** built into the version control system itself, not bolted onto Git.
-
-## Why You're Here: The Graphite Reality
-
-Graphite is a valiant attempt to add stacking to GitHub. But research shows consistent pain points:
-
-### The Problems You Won't Miss
-
-1. **Signed Commits Break** - Organization-mandated GPG signing fails when Graphite rebases internally. No workaround.
-
-2. **Collaboration Friction** - If one developer restacks, collaborators on dependent branches are "hosed." Graphite works best when only one person touches a stack.
-
-3. **Metadata Fragility** - If you use any git command directly (`git rebase`, `git merge`), Graphite's metadata breaks. You must stay within Graphite's commands.
-
-4. **Third-Party Dependency** - Graphite requires an external service for API authentication and PR management. Your workflow depends on their infrastructure.
-
-5. **The Fundamental Mismatch** - As one developer notes: "That mismatch [branches vs. patches] cannot be fully resolved and results in constant friction."
-
-Graphite fights Git's branch model. JJ embraces a change-based model from the ground up.
-
-## What JJ Does Better Than Graphite
+## What JJ Does Better
 
 | What You Loved in Graphite | How JJ Does It Better |
 |----------------------------|----------------------|
-| `gt modify -a` amends current commit | Every file edit **automatically** amends - no command needed |
-| `gt stack restack` rebases dependencies | Automatic - descendants rebase when you edit any commit |
-| `gt ls` visualization | `jj log` - same concept, native to the tool, faster |
-| Git passthrough for git commands | Full Git compatibility - `jj git push`, `jj git fetch` |
+| `gt modify -a` amends current commit | Every file edit **automatically** amends—no command needed |
+| `gt stack restack` rebases dependencies | Automatic—descendants rebase when you edit any commit |
+| `gt ls` visualization | `jj log`—same concept, native to the tool, faster |
+| Git passthrough for git commands | Full Git compatibility—`jj git push`, `jj git fetch` |
 | Branches treated as commits | True commits with stable **change IDs**, branches optional |
-| Undo... (missing in Graphite!) | `jj undo` - undo **ANY** operation |
-| Stack workflow | Native to jj's architecture, not bolted on |
+| Undo... (missing in Graphite!) | `jj undo`—undo **ANY** operation |
+| Stack workflow | Native to JJ's architecture, not bolted on |
+
+### Open Source & No Service Dependency
+
+**JJ is fully open source** (Apache 2.0). LazyJJ works with any Git remote—GitHub, GitLab, Bitbucket, self-hosted. No cloud service required.
+
+Graphite's CLI is source-available but their core service is proprietary. Features like merge queues, dashboards, and PR stack status require their cloud.
+
+### More Powerful Foundation
+
+JJ provides capabilities Graphite simply can't offer:
+
+- **First-class conflicts** — Conflicts don't block your workflow. Keep working, resolve later. See [Working with Conflicts](/tutorials/resolve-conflicts/).
+- **Full undo** — Every operation is recorded and reversible via `jj undo` and `jj op restore`. See [Operation Log](/guides/operation-log/).
+- **Revsets** — A query language for selecting commits: `jj log -r "mine() & mutable()"`.
+- **Anonymous branches** — No branch names required. Work freely, create bookmarks only when pushing PRs.
+- **Offline support** — All operations are local. No network calls.
+
+## Feature Comparison
+
+| Feature | LazyJJ/JJ | Graphite |
+|---------|-----------|----------|
+| Open source | Yes (Apache 2.0) | CLI source-available |
+| Service dependency | None | Required for some features |
+| Git hosting | Any | GitHub only |
+| Conflict handling | First-class | Git's model |
+| Undo support | Full operation log | Limited |
+| Query language | Revsets | None |
+| Offline support | Full | Partial |
+| Customization | Full | Limited |
+| Stacking model | Native to VCS | Wrapper on Git |
+
+## Graphite Pain Points You Won't Miss
+
+1. **Signed Commits Break** — Organization-mandated GPG signing fails when Graphite rebases internally. No workaround.
+
+2. **Collaboration Friction** — If one developer restacks, collaborators on dependent branches are stuck. Graphite works best solo.
+
+3. **Metadata Fragility** — Use any git command directly (`git rebase`, `git merge`) and Graphite's metadata breaks.
+
+4. **Third-Party Dependency** — Your workflow depends on Graphite's infrastructure for API auth and PR management.
+
+5. **The Fundamental Mismatch** — Graphite fights Git's branch model. JJ embraces a change-based model from the ground up.
 
 ## The Mental Model Upgrade
 
@@ -43,15 +65,13 @@ Graphite fights Git's branch model. JJ embraces a change-based model from the gr
 - Treats branches as commits (but they're still Git branches underneath)
 - Forces "one commit per branch" discipline
 - Metadata tracks relationships between branches
-- Git's branch model fights you constantly
 
 ### JJ's Approach
 - Commits have stable **change IDs** that survive rewrites
 - Branches (bookmarks) are optional labels
-- No metadata needed—relationships are in the commit graph
-- The model is designed for stacking from the ground up
+- Relationships live in the commit graph—no metadata needed
 
-This isn't just a nicer CLI—it's a fundamentally better architecture.
+This isn't just a nicer CLI—it's a fundamentally better architecture. See the [Mental Model guide](/guides/mental-model/) for the full explanation.
 
 ## Command Cheatsheet
 
@@ -92,7 +112,7 @@ This isn't just a nicer CLI—it's a fundamentally better architecture.
 | `gt down` / `gt d` | `jj edit <change-id>` | Move down one |
 | `gt top` / `gt t` | `jj stack-top` | Go to top of stack |
 
-**Note**: JJ doesn't have direct "up/down one commit" commands because its commit model is different. Use `jj edit <change-id>` to jump to any commit, or `jj stack-top` to go to the top of the stack.
+**Note**: JJ doesn't have direct "up/down one commit" commands. Use `jj edit <change-id>` to jump to any commit, or `jj stack-top` to go to the top.
 
 ### Reorganizing
 
@@ -111,8 +131,6 @@ This isn't just a nicer CLI—it's a fundamentally better architecture.
 | `gt undo` | `jj undo` | Undo last operation |
 | (none) | `jj op log` | View operation history |
 | (none) | `jj op restore <id>` | Restore to any point |
-
-**Graphite missing**: Comprehensive undo. JJ's operation log records every action—rebase, conflict resolution, anything.
 
 ## Key Workflow Differences
 
@@ -153,8 +171,6 @@ vim file.txt
 # Descendants automatically rebase!
 ```
 
-No manual `gt restack` needed. Ever.
-
 ### 4. Conflicts Don't Block You
 
 ```bash
@@ -171,59 +187,29 @@ jj new -m "Other feature"
 
 See [Working with Conflicts](/tutorials/resolve-conflicts/) for details.
 
-## Problems You Won't Miss
+## When to Use Graphite
 
-### No More "One Commit Per Branch" Discipline
-
-Graphite requires discipline: one commit per branch, always amend. Break this and metadata breaks.
-
-JJ has no such restriction. Commits can have any shape. Use `jj split` if you want to divide them, `jj squash` to combine. The operation log prevents mistakes.
-
-### No More Metadata Breaking with Git Commands
-
-In Graphite, using `git rebase` or `git merge` breaks stack tracking.
-
-In JJ, the operation log is the metadata. Even if you use git commands (`jj git push`, etc.), JJ's state stays consistent. Though you should still prefer jj commands—see [Common Mistakes](/guides/common-mistakes/).
-
-### No More Collaboration Friction
-
-Graphite research shows: "If one dev restacks, collaborators on dependent branches are hosed."
-
-JJ's operation log prevents this. Each developer's operations are local. When you fetch, JJ merges states gracefully. And if something breaks, `jj undo` fixes it.
-
-### No More Third-Party Service Dependency
-
-Graphite requires their API for PR management and authentication.
-
-JJ is a client-side tool. LazyJJ integrates directly with GitHub CLI (`gh`). No external service required.
+Graphite might still be a good choice if you:
+- Need their merge queue feature
+- Want their web dashboard and analytics
+- Prefer their specific PR workflow
+- Are invested in their ecosystem
 
 ## The Transition
 
 ### What Transfers Directly
 
-- **Stack thinking** - You already understand stacked PRs
-- **Visualization** - `jj log` is like `gt ls`, just better
-- **Breaking work into small PRs** - Same workflow
-- **Rebasing discipline** - You're comfortable with history manipulation
+- **Stack thinking** — You already understand stacked PRs
+- **Visualization** — `jj log` is like `gt ls`, just better
+- **Breaking work into small PRs** — Same workflow
+- **Rebasing discipline** — You're comfortable with history manipulation
 
 ### What's Different
 
-- **No staging** - Edit files, they're in the commit. Period.
-- **Automatic amend** - No `gt modify -a` needed
-- **Bookmarks** - Optional, only for pushing to GitHub
-- **Operation log** - Trust `jj undo` and experiment freely
-
-Read the [Mental Model guide](/guides/mental-model/) to understand the shifts.
-
-### Learning Curve
-
-Research on jj transitions shows:
-- **First hour**: Confusion (muscle memory fights you)
-- **Hours 2-4**: Awkwardness (but starting to see benefits)
-- **Hours 4-8**: The "click" (suddenly it makes sense)
-- **After 8 hours**: "I'll never go back"
-
-One developer: "I became comfortable enough with jj to replace git entirely in one day."
+- **No staging** — Edit files, they're in the commit. Period.
+- **Automatic amend** — No `gt modify -a` needed
+- **Bookmarks** — Optional, only for pushing to GitHub
+- **Operation log** — Trust `jj undo` and experiment freely
 
 Graphite users have an advantage—you already understand stacking. You just need to unlearn Git's limitations.
 
@@ -280,9 +266,7 @@ Notice what's missing:
 
 ## Next Steps
 
-- Read the [Mental Model guide](/guides/mental-model/) - Understand jj's approach
-- Try the [Quick Start](/quickstart/) - Get productive in 5 minutes
-- Learn [Common Mistakes](/guides/common-mistakes/) - Avoid frustration
-- Explore the [Operation Log](/guides/operation-log/) - Your safety net
-
-Welcome to version control that finally makes sense. You're going to love it.
+- Read the [Mental Model guide](/guides/mental-model/) — Understand JJ's approach
+- Try the [Quick Start](/quickstart/) — Get productive in 5 minutes
+- Learn [Common Mistakes](/guides/common-mistakes/) — Avoid frustration
+- Explore the [Operation Log](/guides/operation-log/) — Your safety net

@@ -5,27 +5,9 @@ description: Get productive with LazyJJ in 5 minutes, comfortable in 4-8 hours
 
 This guide will get you productive with LazyJJ in 5 minutes. Mastering the mental model takes 4-8 hours, but it's worth it—JJ makes version control finally make sense.
 
-## Understanding JJ's Model (Read This First!)
+## Understanding JJ's Model
 
-Before diving into commands, understand the key difference:
-
-### In Git:
-```
-Edit files → git add → git commit
-(staging area prepares for future commit)
-```
-
-### In JJ:
-```
-Edit files → (changes automatically in commit)
-jj new → (start next commit)
-```
-
-**Your working copy IS a commit**, not a staging area preparing for one. When you edit files, you're editing the commit directly. No `git add` needed—everything is automatic.
-
-This feels strange for the first few hours. Then it clicks, and you'll wonder how you tolerated Git's complexity. Give it time.
-
-Want deeper explanation? Read the [Mental Model guide](/guides/mental-model/) after finishing this quickstart.
+**Your working copy IS a commit.** When you edit files, you're editing the commit directly—no `git add`, no staging area. Use `jj new` to seal the current commit and start the next one. Read the [Mental Model guide](/guides/mental-model/) for the full explanation.
 
 ---
 
@@ -196,21 +178,6 @@ Full list: [Common Mistakes guide](/guides/common-mistakes/)
 
 ---
 
-## The Learning Curve (It's Worth It)
-
-Research across 20+ guides shows a consistent pattern:
-
-- **Minutes 1-30**: Confusion ("Where's `git add`?")
-- **Hours 1-4**: Awkwardness (muscle memory fights you)
-- **Hours 4-8**: The "click" (suddenly it makes sense)
-- **After 8 hours**: "I'll never go back to Git"
-
-One developer: "I became comfortable enough with jj to replace git entirely in **one day**."
-
-Don't fight the model. Let it feel strange for a few hours. Your Git habits will adapt.
-
----
-
 ## Next Steps
 
 ### Essential Reading (10 minutes)
@@ -231,5 +198,3 @@ Don't fight the model. Let it feel strange for a few hours. Your Git habits will
 ### Integrations
 - [GitHub Integration](/integrations/github/) - Stacked PRs
 - [Claude Integration](/integrations/claude/) - AI-assisted development
-
-Give yourself 4-8 hours with JJ. The "aha moment" is real, and it's worth the initial learning curve.

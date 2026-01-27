@@ -5,7 +5,7 @@ description: Make changes to commits in the middle of your stack
 
 > **This is the workflow Git makes painful and JJ makes trivial.**
 
-This tutorial shows how to modify commits that aren't at the top of your stack—a common need when responding to PR feedback. Research shows 18 out of 20 major JJ resources praise automatic rebasing as the killer feature.
+This tutorial shows how to modify commits that aren't at the top of your stack—a common need when responding to PR feedback.
 
 ## The Scenario
 
@@ -69,22 +69,7 @@ All PRs in the stack will be updated.
 
 ## What Happens Automatically
 
-When you edit a mid-stack commit, JJ automatically:
-
-1. **Rebases dependent commits** - The `user-api` commit is rebased on top of your modified `user-model`
-2. **Updates bookmarks** - Bookmark pointers are adjusted
-3. **Detects conflicts** - If your change conflicts with later commits, JJ marks them
-
-**This is jj's killer feature.** Research across 20+ guides consistently highlights automatic rebasing as the workflow transformation that makes developers rave about JJ.
-
-In Git, you'd manually:
-1. `git rebase -i` to mark the commit for editing
-2. `git commit --amend` to modify it
-3. `git rebase --continue` to finish
-4. Resolve conflicts at each step
-5. Force push all affected branches
-
-In JJ, it's automatic. Edit the commit, descendants rebase.
+When you edit a mid-stack commit, JJ automatically rebases all dependent commits, adjusts bookmark pointers, and detects conflicts. **This is JJ's killer feature** — no `git rebase -i` / `--continue` dance needed.
 
 ## Complete Example
 
@@ -191,22 +176,6 @@ After editing mid-stack, your remote PRs are out of date:
 ```bash
 jj stack-submit   # Updates all PRs
 ```
-
-## Why This Is Easier Than Git
-
-In Git, editing a mid-stack commit requires:
-1. `git rebase -i` to mark the commit for editing
-2. `git commit --amend` to modify it
-3. `git rebase --continue` to finish
-4. Resolving conflicts manually at each step
-5. Force pushing all affected branches
-
-In JJ, it's just:
-1. `jj edit <commit>`
-2. Make changes
-3. `jj stack-submit`
-
-JJ handles all the rebasing automatically.
 
 ## Next Steps
 
